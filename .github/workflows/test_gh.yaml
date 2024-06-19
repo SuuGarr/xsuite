@@ -47,8 +47,8 @@ jobs:
           xfields,
           xmask,
           xcoll,
-          xboinc
-        ]
+          xboinc, ]
+    
     # Make the default shell a login shell, so that conda is initialised properly
     defaults:
       run:
@@ -71,21 +71,27 @@ jobs:
       run: |
         conda install openmp
         pip install cython
+    - name: Install jq
+      run: sudo apt-get install -y jq
     - name: Checkout xsuite
       uses: actions/checkout@v4
       with:
         path: xsuite
     - name: Check out xsuite repos & pip install
       env:
-        Branch_locations: ${{ inputs.locations }}
         precompile_kernels: ${{ inputs.precompile_kernels }}
       run: |
-        export xsuite_prefix="$GITHUB_WORKSPACE"
-        echo $Branch_locations | jq-r 'to_entries | .[] | "\(.value)"' | while read -r branch; do
-          repo = $(echo $branch | cut -d: -f1)
-          branch = $(echo $branch | cut -d: -f2)
-          git clone -b $branch https://github.com/$repo.git $xsuite_prefix/$repo
+        echo '${{ inputs.locations }}' | jq '.' > locations.json
+        branch_xobjects=$(jq -r '.["xobjects_locations"]' locations.json)
+        branch_xdeps=$(jq -r '.["xdeps_locations"]' locations.json)
+        branch_xpart=$(jq -r '.["xpart_locations"]' locations.json)
+        branch_xtrack=$(jq -r '.["xtrack_locations"]' locations.json)
+        branch_xfields=$(jq -r '.["xfields_locations"]' locations.json)
+        branch_xmask=$(jq -r '.["xmask_locations"]' locations.json)
+        branch_xcoll=$(jq -r '.["xcoll_locations"]' locations.json)
+        branch_xboinc=$(jq -r '.["xboinc_locations"]' locations.json)
         bash $GITHUB_WORKSPACE/xsuite/.github/scripts/install_branches.sh
+
     - name: Precompile kernels
       if: ${{ inputs.precompile_kernels == true }}
       run: |
