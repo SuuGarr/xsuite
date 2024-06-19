@@ -36,23 +36,19 @@ jobs:
     runs-on: ubuntu-latest
     
     # Run tests for all the xsuite packages in separate jobs in parallel
-    {
-      "strategy":{
-        "fail-fast": false,
-        "matrix":{
-          "test-suite": [
-            xobjects,
-            xdeps,
-            xpart,
-            xtrack,
-            xfields,
-            xmask,
-            xcoll,
-            xboinc
-          ]
-        }
-      }
-    }
+    strategy:
+      fail-fast: false
+      matrix:
+        test-suite: [
+          xobjects,
+          xdeps,
+          xpart,
+          xtrack,
+          xfields,
+          xmask,
+          xcoll,
+          xboinc
+        ]
     # Make the default shell a login shell, so that conda is initialised properly
     defaults:
       run:
@@ -81,7 +77,14 @@ jobs:
         path: xsuite
     - name: Check out xsuite repos & pip install
       env:
-        locations: ${{ inputs.locations }}
+        xobjects_location: ${{ fromJson(inputs.xobjects_locations) }}
+        xdeps_location: ${{ fromJson(inputs.xdeps_locations) }}
+        xpart_location: ${{ fromJson(inputs.xpart_locations) }}
+        xtrack_location: ${{ fromJson(inputs.xtrack_locations) }}
+        xfields_location: ${{ fromJson(inputs.xfields_locations) }}
+        xmask_location: ${{ fromJson(inputs.xmask_locations) }}
+        xcoll_location: ${{ fromJson(inputs.xcoll_locations) }}
+        xboinc_location: ${{ fromJson(inputs.xboinc_locations) }}
         precompile_kernels: ${{ inputs.precompile_kernels }}
       run: |
         export xsuite_prefix="$GITHUB_WORKSPACE"
