@@ -39,15 +39,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test-suite: [
-          xobjects,
-          xdeps,
-          xpart,
-          xtrack,
-          xfields,
-          xmask,
-          xcoll,
-          xboinc, ]
+        test-suite: 
+          - xobjects
+          - xdeps
+          - xpart
+          - xtrack
+          - xfields
+          - xmask
+          - xcoll
+          - xboinc
     
     # Make the default shell a login shell, so that conda is initialised properly
     defaults:
@@ -79,10 +79,18 @@ jobs:
         path: xsuite
     - name: Check out xsuite repos & pip install
       env:
-        branch_locations: ${{ inputs.locations }}
         precompile_kernels: ${{ inputs.precompile_kernels }}
       run: |
-        export xsuite_prefix="$GITHUB_WORKSPACE"
+        echo '${{ inputs.locations }}' | jq '.' > locations.json
+        export xobjects_branch=$(jq -r '.["xobjects_location"]' locations.json) 
+        export xdeps_branchn=$(jq -r '.["xdeps_location"]' locations.json)
+        export xpart_branch=$(jq -r '.["xpart_location"]' locations.json) 
+        export xtrack_branch=$(jq -r '.["xtrack_location"]' locations.json)
+        export xfields_branch=$(jq -r '.["xfields_location"]' locations.json) 
+        export xmask_branch=$(jq -r '.["xmask_location"]' locations.json)
+        export xcoll_branch=$(jq -r '.["xcoll_location"]' locations.json)
+        export xboinc_branch=$(jq -r '.["xboinc_location"]' locations.json)
+        export xsuite_prefix="$GITHUB_WORKSPACE" 
         bash $GITHUB_WORKSPACE/xsuite/.github/scripts/install_branches.sh
     - name: Precompile kernels
       if: ${{ inputs.precompile_kernels == true }}
