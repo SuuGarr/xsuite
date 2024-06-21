@@ -114,15 +114,15 @@ jobs:
         else
           echo "use_default=false" >> $GITHUB_ENV
     - name: Run test command
-    if: env.use_default == 'false'
-    env:
-      image_id: ${{ needs.build-test-image.outputs.image_id }}
-    run: |
-      docker run --rm --gpus all \
-        --env XOBJECTS_TEST_CONTEXTS="${{ inputs.test_contexts }}" \
-        -v $PWD/reports:/opt/reports:Z \
-        ${{ needs.build-test-image.outputs.image_id }} \
-        /bin/bash -c "${{ inputs.test_command }}"
+      if: env.use_default == 'false'
+      env:
+        image_id: ${{ needs.build-test-image.outputs.image_id }}
+      run: |
+        docker run --rm --gpus all \
+          --env XOBJECTS_TEST_CONTEXTS="${{ inputs.test_contexts }}" \
+          -v $PWD/reports:/opt/reports:Z \
+          ${{ needs.build-test-image.outputs.image_id }} \
+          /bin/bash -c "${{ inputs.test_command }}"
     - name: Run pytest
       if: env.use_default == 'true'
       env:
