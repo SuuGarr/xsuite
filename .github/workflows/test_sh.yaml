@@ -103,7 +103,7 @@ jobs:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [build-test-image, image-sanity-checks]
     timeout-minutes: 540
-    if: (needs.build-test-image.outputs.image_id != '' && needs.build-test-image.result == 'success') || (inputs.test_command != '')
+    if: (inputs.test_command != '' || (needs.build-test-image.outputs.image_id != '' && needs.build-test-image.result == 'success'))
     strategy:
       fail-fast: false
       matrix:
@@ -114,7 +114,7 @@ jobs:
           IMAGE_ID: ${{ needs.build-test-image.outputs.image_id }}
           TEST_CONTEXTS: ${{ inputs.test_contexts }}
         run: |
-          if [ "${{ inputs.test_command }}" != "" ]; then
+          if [ -n "${{ inputs.test_command }}" ]; then
             echo "Running specific test command: ${{ inputs.test_command }}"
             docker run --rm -v $PWD:/workspace \
               -w /workspace \
