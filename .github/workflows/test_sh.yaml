@@ -110,10 +110,10 @@ jobs:
         test-suite: ${{ fromJson(inputs.suites) }}
     steps:
       - name: Debugging Info
-          run: |
-            echo "Test Command: ${{ inputs.test_command }}"
-            echo "Image ID: ${{ needs.build-test-image.outputs.image_id }}"
-            echo "Image Build Result: ${{ needs.build-test-image.result }}"
+        run: |
+          echo "Test Command: ${{ inputs.test_command }}"
+          echo "Image ID: ${{ needs.build-test-image.outputs.image_id }}"
+          echo "Image Build Result: ${{ needs.build-test-image.result }}"
       - name: Run specified test command or default test suites
         env:
           IMAGE_ID: ${{ needs.build-test-image.outputs.image_id }}
