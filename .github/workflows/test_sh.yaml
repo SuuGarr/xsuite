@@ -57,6 +57,7 @@ jobs:
             echo "skip=false" >> $GITHUB_ENV
           fi
       - name: Install jq
+        if: env.skip == 'false'
         run: |
           if command -v apt-get &> /dev/null; then
             sudo apt-get update && sudo apt-get install -y jq
@@ -65,9 +66,11 @@ jobs:
           fi
       - id: checkout-repo
         name: Checkout the repo
+        if: env.skip == 'true'
         uses: actions/checkout@v3
       - id: build-image
         name: Build the test image
+        if: env.skip == 'false'
         run: |
           echo '${{ inputs.locations }}' | jq '.' > locations.json
           IMAGE="xsuite-test-runner-$(cat /proc/sys/kernel/random/uuid)"
@@ -116,8 +119,6 @@ jobs:
     steps:
     - name: Run Custom Test Command 
       if: env.skip == 'true'
-      env:
-        image_id: ${{ needs.build-test-image.outputs.image_id }}
       run: | 
         echo "Running Custom Test Command : ${{ inputs.est_command }}"
         docker run --rm ${image_id} sh -c "${{ inputs.test_command }}"
