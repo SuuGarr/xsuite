@@ -103,7 +103,7 @@ jobs:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [build-test-image, image-sanity-checks]
     timeout-minutes: 540
-    if: success() && needs.build-test-image.outputs.image_id != ''
+    if: always() && (needs.build-test-image.result == 'success' || '${{ inputs.test_command }}' != '')
     strategy:
       fail-fast: false
       matrix:
