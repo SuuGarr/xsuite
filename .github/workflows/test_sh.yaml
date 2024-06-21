@@ -83,6 +83,7 @@ jobs:
   image-sanity-checks:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: build-test-image
+    if: needs.build-test-image.outputs.image_id != ''
     env:
       image_id: ${{ needs.build-test-image.outputs.image_id }}
     steps:
@@ -141,9 +142,9 @@ jobs:
   teardown:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [build-test-image, wait]
+    if: always()
     env:
       image_id: ${{ needs.build-test-image.outputs.image_id }}
-    if: always()
     steps:
       - name: Stop the containers and remove the image
         run: |
