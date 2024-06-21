@@ -98,7 +98,7 @@ jobs:
 
   # Run the tests for each repo in parallel in a test container
   run-tests:
-    runs-on: [self-hosted, "${{ inputs.platform }}"]
+    runs-on: [self-hosted, "${{ inputs.platform }}" ]
     needs: [build-test-image, image-sanity-checks]
     timeout-minutes: 540
     strategy:
@@ -117,6 +117,7 @@ jobs:
           --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
           -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
           ${image_id} \
+          ${inputs.test_command}
           /opt/run_tests.sh /opt/xsuite/${{ matrix.test-suite }}/tests
 
   wait:
