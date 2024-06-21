@@ -48,14 +48,6 @@ jobs:
     outputs:
       image_id: ${{ steps.build-image.outputs.image_id }}
     steps:
-      - name: Check test command is provide
-        id: Check_command
-        run: |
-          if [ -n "${{ inputs.test_command }}" ]; then
-            echo "skip=true" >> $GITHUB_ENV
-          else
-            echo "skip=false" >> $GITHUB_ENV
-          fi
       - name: Install jq
         run: |
           if command -v apt-get &> /dev/null; then
@@ -106,7 +98,7 @@ jobs:
 
   # Run the tests for each repo in parallel in a test container
   run-tests:
-    runs-on: [self-hosted, "${{ inputs.platform }}"]
+    runs-on: [self-hosted, "${{ inputs.platform }}", "${{ inputs.test_command }}"]
     needs: [build-test-image, image-sanity-checks]
     timeout-minutes: 540
     strategy:
@@ -115,12 +107,16 @@ jobs:
         test-suite: ${{ fromJson(inputs.suites) }}
     steps:
     - name: Run Custom Test Command 
-      if: env.skip == 'true'
+      if: inputs.test_command != ''
+      env : 
+        image_id: ${{ needs.build-test-image.outputs.image_id }}
       run: | 
-        echo "Running Custom Test Command : ${{ inputs.est_command }}"
-        docker run --rm ${image_id} sh -c "${{ inputs.test_command }}"
+          docker run --rm --gpus all \
+          --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
+          ${image_id} \
+          /bin/bash -c "${{ inputs.test_command }}"
     - name: Run pytest
-      if: env.skip == 'false'
+      if: inputs.test_command == ''
       env:
         image_id: ${{ needs.build-test-image.outputs.image_id }}
         test_contexts: ${{ inputs.test_contexts }}
