@@ -100,51 +100,27 @@ jobs:
 
   # Run the tests for each repo in parallel in a test container
   run-tests:
-    runs-on: [self-hosted, "${{ inputs.platform }}", "${{ inputs.test_command }}"]
+    runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [build-test-image, image-sanity-checks]
     timeout-minutes: 540
     strategy:
       fail-fast: false
       matrix:
         test-suite: ${{ fromJson(inputs.suites) }}
+
     steps:
-<<<<<<< HEAD
-=======
-    - name: Check Test command it provide
-      id: check_command
-      run: |
-        if [ -z "${{ inputs.test_command }}" ]; then
-          echo "use_default=true" >> $GITHUB_ENV
-        else
-          echo "use_default=false" >> $GITHUB_ENV
-    - name: Run test command
-      if: env.use_default == 'false'
-      env:
-        image_id: ${{ needs.build-test-image.outputs.image_id }}
-      run: |
-        docker run --rm --gpus all \
-          --env XOBJECTS_TEST_CONTEXTS="${{ inputs.test_contexts }}" \
-          -v $PWD/reports:/opt/reports:Z \
-          ${{ needs.build-test-image.outputs.image_id }} \
-          /bin/bash -c "${{ inputs.test_command }}"
->>>>>>> b099a631a1996c2f04804143fc9060610c75082c
     - name: Run pytest
       env:
         image_id: ${{ needs.build-test-image.outputs.image_id }}
         test_contexts: ${{ inputs.test_contexts }}
       run: |
-        if [ -z "${{ inputs.test_command }}" ]; then
-          mkdir -p reports/${{ matrix.test-suite }}
-          docker run --rm --gpus all \
-            --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
-            -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
-            ${image_id} \
-            /opt/run_tests.sh /opt/x/${{ matrix.test-suite }}/tests
-        else
-          docker run --rm --gpus all \
-            --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
-            ${image_id} \
-            ${{ inputs.test_command }}
+        mkdir -p reports/${{ matrix.test-suite }}
+        docker run --rm --gpus all \
+          --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
+          -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
+          ${image_id} \
+          /opt/run_tests.sh /opt/xsuite/${{ matrix.test-suite }}/tests
+          
   wait:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [build-test-image, run-tests]
