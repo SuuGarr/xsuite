@@ -47,6 +47,7 @@ jobs:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
       image_id: ${{ steps.build-image.outputs.image_id }}
+    if: inputs.test_command == ''
     steps:
       - name: Install jq
         run: |
@@ -111,19 +112,18 @@ jobs:
         image_id: ${{ needs.build-test-image.outputs.image_id }}
         test_contexts: ${{ inputs.test_contexts }}
       run: |
-        if [ -n "${{ inputs.test_command }}" ]; then
-          docker run --rm --gpus all \
-            -v $PWD:/opt/workdir \
-            ${image_id} \
-            bash -c "${{ inputs.test_command }}"
-        else
-          mkdir -p reports/${{ matrix.test-suite }}
-          docker run --rm --gpus all \
-            --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
-            -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
-            ${image_id} \
-            /opt/run_tests.sh /opt/x/${{ matrix.test-suite }}/tests
-
+          if [ "${{ inputs.test_command }}" != '' ]; then
+            echo "Running specific test command: ${{ inputs.test_command }}"
+            ${{ inputs.test_command }}
+          else
+            echo "Running default test suites"
+            IMAGE_ID=$GITHUB_ENV:image_id
+            mkdir -p reports/${{ matrix.test-suite }}
+            docker run --rm --gpus all \
+              --env 1_TEST_CONTEXTS="${{ inputs.test_contexts }}" \
+              -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
+              $IMAGE_ID \
+              /opt/run_tests.sh /opt/x/${{ matrix.test-suite }}/tests
   wait:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [build-test-image, run-tests]
