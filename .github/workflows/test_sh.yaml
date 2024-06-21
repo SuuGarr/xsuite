@@ -48,7 +48,11 @@ jobs:
     outputs:
       image_id: ${{ steps.build-image.outputs.image_id }}
     steps:
+      - name: Check test command is provide
+        id: Check_command
+        run: echo " ::set-output name=skip::${{ inputs.test_command != '' }}"
       - name: Install jq
+        if: steps.check_command.outputs.skip == 'false'
         run: |
           if command -v apt-get &> /dev/null; then
             sudo apt-get update && sudo apt-get install -y jq
@@ -57,9 +61,11 @@ jobs:
           fi
       - id: checkout-repo
         name: Checkout the repo
+        if: steps.check_command.outputs.skip == 'false'
         uses: actions/checkout@v3
       - id: build-image
         name: Build the test image
+        if: steps.check_command.outputs.skip == 'false'
         run: |
           echo '${{ inputs.locations }}' | jq '.' > locations.json
           IMAGE="xsuite-test-runner-$(cat /proc/sys/kernel/random/uuid)"
@@ -98,7 +104,7 @@ jobs:
 
   # Run the tests for each repo in parallel in a test container
   run-tests:
-    runs-on: [self-hosted, "${{ inputs.platform }}" ]
+    runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [build-test-image, image-sanity-checks]
     timeout-minutes: 540
     strategy:
@@ -106,25 +112,23 @@ jobs:
       matrix:
         test-suite: ${{ fromJson(inputs.suites) }}
     steps:
-    - name: Run Pytest
+    - name: Run Custom Test Command 
+      if: steps.check_command.outputs.skip == 'true'
+      run: | 
+        echo "Running Custom Test Command : ${{ inputs.est_command }}"
+        docker run --rm ${image_id} sh -c "${{ inputs.test_command }}"
+    - name: Run pytest
+      if: steps.check_command.outputs.skip == 'false'
       env:
         image_id: ${{ needs.build-test-image.outputs.image_id }}
         test_contexts: ${{ inputs.test_contexts }}
       run: |
-        if [ -n "${{ inputs.test_command }}"]; then
-          echo "Running custom test command"
-          docker run --rm --gpus all ${image_id} sh -c "${{ inputs.test_command }}"
-        else 
-          echo "Ruuning default test suites"
-          for suite in $(echo ${{ inputs.suites }} | jq -r '.[]') ; do
-           mkdir -p reports/${{ matrix.test-suite }}
-            docker run --rm --gpus all \
-              --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
-              -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
-              ${image_id} \
-              /opt/run_tests.sh /opt/x/${{ matrix.test-suite }}/tests
-            done
-          fi
+        mkdir -p reports/${{ matrix.test-suite }}
+        docker run --rm --gpus all \
+          --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
+          -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
+          ${image_id} \
+          /opt/run_tests.sh /opt/xsuite/${{ matrix.test-suite }}/tests
   wait:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [build-test-image, run-tests]
