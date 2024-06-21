@@ -106,27 +106,24 @@ jobs:
       matrix:
         test-suite: ${{ fromJson(inputs.suites) }}
     steps:
-    - name: Run Custom Test Command 
-      if: inputs.test_command != ''
-      env : 
-        image_id: ${{ needs.build-test-image.outputs.image_id }}
-      run: | 
-          docker run --rm --gpus all \
-          --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
-          ${image_id} \
-          /bin/bash -c "${{ inputs.test_command }}"
     - name: Run pytest
-      if: inputs.test_command == ''
       env:
         image_id: ${{ needs.build-test-image.outputs.image_id }}
         test_contexts: ${{ inputs.test_contexts }}
       run: |
-        mkdir -p reports/${{ matrix.test-suite }}
-        docker run --rm --gpus all \
-          --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
-          -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
-          ${image_id} \
-          /opt/run_tests.sh /opt/xsuite/${{ matrix.test-suite }}/tests
+        if [ -z "${{ inputs.test_command }}" ]; then
+          mkdir -p reports/${{ matrix.test-suite }}
+          docker run --rm --gpus all \
+            --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
+            -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
+            ${image_id} \
+            /opt/run_tests.sh /opt/x/${{ matrix.test-suite }}/tests
+        else
+          docker run --rm --gpus all \
+              --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
+              -v $PWD:/opt/x:Z \
+              ${image_id} \
+              bash -c "${{ inputs.test_command }}"
   wait:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [build-test-image, run-tests]
