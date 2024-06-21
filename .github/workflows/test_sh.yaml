@@ -102,6 +102,7 @@ jobs:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [build-test-image, image-sanity-checks]
     timeout-minutes: 540
+    if: success() && needs.build-test-image.outputs.image_id != ''
     strategy:
       fail-fast: false
       matrix:
@@ -112,12 +113,12 @@ jobs:
         image_id: ${{ needs.build-test-image.outputs.image_id }}
         test_contexts: ${{ inputs.test_contexts }}
       run: |
-          if [ "${{ inputs.test_command }}" != '' ]; then
+          if [ "${{ inputs.test_command }}" != "" ]; then
             echo "Running specific test command: ${{ inputs.test_command }}"
             docker run --rm -v $PWD:/workspace \
               -w /workspace \
               ${image_id} \
-              ${{ inputs.test_command }}
+              bash -c "${{ inputs.test_command }}"
           else
             echo "Running default test suites for suite ${{ matrix.test-suite }}"
             mkdir -p reports/${{ matrix.test-suite }}
