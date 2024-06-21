@@ -137,14 +137,25 @@ jobs:
   teardown:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [build-test-image, wait]
+    if: always()
     env:
       image_id: ${{ needs.build-test-image.outputs.image_id }}
     if: always()
     steps:
       - name: Stop the containers and remove the image
         run: |
-          docker container stop \
-            $(docker ps -q --filter ancestor=${image_id}) || true
-          docker container rm --volumes \
-            $(docker ps -qa --filter ancestor=${image_id}) || true
-          docker image rm ${image_id}
+          CONTAINERS=$(docker ps -q --filter ancestor=${{ needs.build-test-image.outputs.image_id }} || true)
+          if [ -n "$CONTAINERS" ]; then
+            echo "Stopping containers: $CONTAINERS"
+            docker container stop $CONTAINERS
+            docker container rm --volumes $CONTAINERS
+          else
+            echo "No containers to stop."
+          fi
+          IMAGE_ID=${{ needs.build-test-image.outputs.image_id }}
+          if [ -n "$IMAGE_ID" ] && [ "$(docker images -q $IMAGE_ID 2> /dev/null)" != "" ]; then
+            echo "Removing image: $IMAGE_ID"
+            docker image rm $IMAGE_ID
+          else
+            echo "No image to remove."
+          fi
