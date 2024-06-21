@@ -47,7 +47,6 @@ jobs:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
       image_id: ${{ steps.build-image.outputs.image_id }}
-    if: inputs.test_command == ''
     steps:
       - name: Install jq
         run: |
