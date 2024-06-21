@@ -64,7 +64,8 @@ jobs:
         run: |
           echo '${{ inputs.locations }}' | jq '.' > locations.json
           IMAGE="xsuite-test-runner-$(cat /proc/sys/kernel/random/uuid)"
-          echo "image_id=$IMAGE" >> $GITHUB_OUTPUT
+          echo "IMAGE=$IMAGE" >> $GITHUB_EN
+          echo "::set-output name=image_id::$IMAGE" 
           docker build \
             --network=host \
             --no-cache=true \
