@@ -109,6 +109,11 @@ jobs:
       matrix:
         test-suite: ${{ fromJson(inputs.suites) }}
     steps:
+      - name: Debugging Info
+          run: |
+            echo "Test Command: ${{ inputs.test_command }}"
+            echo "Image ID: ${{ needs.build-test-image.outputs.image_id }}"
+            echo "Image Build Result: ${{ needs.build-test-image.result }}"
       - name: Run specified test command or default test suites
         env:
           IMAGE_ID: ${{ needs.build-test-image.outputs.image_id }}
@@ -128,11 +133,6 @@ jobs:
               -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
               $IMAGE_ID \
               /opt/run_tests.sh /opt/xsuite/${{ matrix.test-suite }}/tests
-        - name: Debugging Info
-          run: |
-            echo "Test Command: ${{ inputs.test_command }}"
-            echo "Image ID: ${{ needs.build-test-image.outputs.image_id }}"
-            echo "Image Build Result: ${{ needs.build-test-image.result }}"
 
   wait:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
