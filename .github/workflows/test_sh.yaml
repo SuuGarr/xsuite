@@ -58,8 +58,6 @@ jobs:
       - id: checkout-repo
         name: Checkout the repo
         uses: actions/checkout@v3
-      - name: Run Pytest on Test Command
-        run: pytest ${{ github.event.inputs.test_command }}
       - id: build-image
         name: Build the test image
         run: |
@@ -107,19 +105,24 @@ jobs:
       fail-fast: false
       matrix:
         test-suite: ${{ fromJson(inputs.suites) }}
-
     steps:
     - name: Run pytest
       env:
         image_id: ${{ needs.build-test-image.outputs.image_id }}
         test_contexts: ${{ inputs.test_contexts }}
       run: |
-        mkdir -p reports/${{ matrix.test-suite }}
-        docker run --rm --gpus all \
-          --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
-          -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
-          ${image_id} \
-          /opt/run_tests.sh /opt/xsuite/${{ matrix.test-suite }}/tests
+        if [ -n "${{ inputs.test_command }}" ]; then
+          docker run --rm --gpus all \
+            -v $PWD:/opt/workdir \
+            ${image_id} \
+            bash -c "${{ inputs.test_command }}"
+        else
+          mkdir -p reports/${{ matrix.test-suite }}
+          docker run --rm --gpus all \
+            --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
+            -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
+            ${image_id} \
+            /opt/run_tests.sh /opt/x/${{ matrix.test-suite }}/tests
 
   wait:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
