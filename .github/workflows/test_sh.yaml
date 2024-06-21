@@ -21,7 +21,7 @@ on:
         type: string
       test_command:
         description: test command
-        required: false
+        required: true
         type: string
       test_contexts:
         required: false
