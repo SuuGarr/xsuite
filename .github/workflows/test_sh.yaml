@@ -47,6 +47,7 @@ jobs:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
       image_id: ${{ steps.build-image.outputs.image_id }}
+    if: inputs.test_command == ''
     steps:
       - name: Install jq
         run: |
@@ -63,8 +64,7 @@ jobs:
         run: |
           echo '${{ inputs.locations }}' | jq '.' > locations.json
           IMAGE="xsuite-test-runner-$(cat /proc/sys/kernel/random/uuid)"
-          echo "IMAGE=$IMAGE" >> $GITHUB_EN
-          echo "::set-output name=image_id::$IMAGE" 
+          echo "::set-output name=image_id::$IMAGE"
           docker build \
             --network=host \
             --no-cache=true \
