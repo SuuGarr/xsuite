@@ -114,7 +114,10 @@ jobs:
       run: |
           if [ "${{ inputs.test_command }}" != '' ]; then
             echo "Running specific test command: ${{ inputs.test_command }}"
-            ${{ inputs.test_command }}
+            docker run --rm -v $PWD:/workspace \
+              -w /workspace \
+              ${image_id} \
+              ${{ inputs.test_command }}
           else
             echo "Running default test suites for suite ${{ matrix.test-suite }}"
             mkdir -p reports/${{ matrix.test-suite }}
