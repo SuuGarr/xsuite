@@ -58,15 +58,6 @@ jobs:
       - id: checkout-repo
         name: Checkout the repo
         uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.8'
-      - name: Install Python packages
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install pytest
       - name: Run Pytest on Test Command
         run: pytest ${{ github.event.inputs.test_command }}
       - id: build-image
