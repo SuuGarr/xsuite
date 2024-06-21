@@ -117,7 +117,7 @@ jobs:
           --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
           -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
           ${image_id} \
-          ${inputs.test_command}
+          ${inputs.test_command}\
           /opt/run_tests.sh /opt/xsuite/${{ matrix.test-suite }}/tests
 
   wait:
