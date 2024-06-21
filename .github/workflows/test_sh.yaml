@@ -154,10 +154,10 @@ jobs:
           else
             echo "No containers to stop."
           fi
-          IMAGE_ID=${{ needs.build-test-image.outputs.image_id }}
-          if [ -n "$IMAGE_ID" ] && [ "$(docker images -q $IMAGE_ID 2> /dev/null)" != "" ]; then
-            echo "Removing image: $IMAGE_ID"
-            docker image rm $IMAGE_ID
+          image_id=${{ needs.build-test-image.outputs.image_id }}
+          if [ -n "$image_id" ] && [ "$(docker images -q $image_id 2> /dev/null)" != "" ]; then
+            echo "Removing image: $image_id"
+            docker image rm $image_id
           else
             echo "No image to remove."
           fi
