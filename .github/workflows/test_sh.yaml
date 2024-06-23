@@ -114,9 +114,9 @@ jobs:
           IMAGE_ID: ${{ needs.build-test-image.outputs.image_id }}
           TEST_CONTEXTS: ${{ inputs.test_contexts }}
         run: |
-           if [ "${{ inputs.test_command }}" != "" ]; then
+          if [ "${{ inputs.test_command }}" != "" ]; then
             echo "Running specific test command: ${{ inputs.test_command }}"
-            pytest "${{ inputs.test_command }}" 
+            pytest "${{ inputs.test_command }}"
           else
             echo "Running default test suites for suite ${{ matrix.test-suite }}"
             mkdir -p reports/${{ matrix.test-suite }}
