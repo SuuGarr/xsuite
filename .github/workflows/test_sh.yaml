@@ -47,7 +47,7 @@ jobs:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
       image_id: ${{ steps.build-image.outputs.image_id }}
-    if: inputs.test_command == ''
+    if: ${{ inputs.test_command == '' }}
     steps:
       - name: Install jq
         run: |
@@ -85,7 +85,7 @@ jobs:
     needs: build-test-image
     env:
       image_id: ${{ needs.build-test-image.outputs.image_id }}
-    if: needs.build-test-image.outputs.image_id != ''
+    if: ${{ needs.build-test-image.outputs.image_id != '' }}
     steps:
       - name: CUDA/ROCm info
         if: ${{ env.with_gpu == 'true' }}
@@ -103,7 +103,7 @@ jobs:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [build-test-image, image-sanity-checks]
     timeout-minutes: 540
-    if: inputs.test_command != '' || (needs.build-test-image.outputs.image_id != '' && needs.build-test-image.result == 'success')
+    if: ${{ inputs.test_command != '' || (needs.build-test-image.outputs.image_id != '' && needs.build-test-image.result == 'success') }}
     strategy:
       fail-fast: false
       matrix:
@@ -111,10 +111,9 @@ jobs:
     steps:
       - name: Print environment information
         run: |
-          echo "Running on platform: ${{ inputs.platform }}"
           echo "Test command provided: ${{ inputs.test_command }}"
           echo "Image ID: ${{ needs.build-test-image.outputs.image_id }}"
-      
+          echo "Image Build Result: ${{ needs.build-test-image.result }}"
       - name: Run test command or default test suites
         env:
           IMAGE_ID: ${{ needs.build-test-image.outputs.image_id }}
