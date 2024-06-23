@@ -109,6 +109,12 @@ jobs:
         test-suite: ${{ fromJson(inputs.suites) }}
     if: inputs.test_command != '' || (needs.build-test-image.outputs.image_id != '' && needs.build-test-image.result == 'success')
     steps:
+      - name: Print environment information
+        run: |
+          echo "Running on platform: ${{ inputs.platform }}"
+          echo "Test command provided: ${{ inputs.test_command }}"
+          echo "Image ID: ${{ needs.build-test-image.outputs.image_id }}"
+      
       - name: Run test command or default test suites
         env:
           IMAGE_ID: ${{ needs.build-test-image.outputs.image_id }}
