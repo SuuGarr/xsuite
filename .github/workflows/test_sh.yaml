@@ -141,6 +141,14 @@ jobs:
       - name: Debugging Info
         run: |
           echo "Test Command: ${{ inputs.test_command }}"
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
       - name: Run specified test command
         run: |
           echo "Running specific test command: ${{ inputs.test_command }}"
