@@ -101,7 +101,7 @@ jobs:
   # Run the tests for each repo in parallel in a test container
   run-tests:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
-    needs: ${{ inputs.test_command == '' ? ['build-test-image', 'image-sanity-checks'] : [] }}
+    needs: [build-test-image, image-sanity-checks]
     timeout-minutes: 540
     if: ${{ inputs.test_command != '' || (needs.build-test-image.outputs.image_id != '' && needs.build-test-image.result == 'success') }}
     strategy:
