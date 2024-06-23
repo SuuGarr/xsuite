@@ -83,7 +83,7 @@ jobs:
   image-sanity-checks:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: build-test-image
-    if: needs.build-test-image.outputs.image_id != ''
+    if: inputs.test_command == '' && needs.build-test-image.outputs.image_id != ''
     env:
       image_id: ${{ needs.build-test-image.outputs.image_id }}
     steps:
@@ -100,10 +100,11 @@ jobs:
 
   # Run the tests for each repo in parallel in a test container
   run-tests:
-    runs-on: [self-hosted, "${{ inputs.platform }}"]
+    runs-on: [self-hosted, "${{ inputs.platform }}" , "${{ inputs.test_command }}"]
     needs: [build-test-image, image-sanity-checks]
     timeout-minutes: 540
-    if: (inputs.test_command != '' || (needs.build-test-image.outputs.image_id != '' && needs.build-test-image.result == 'success'))
+    if: inputs.test_command != '' || (inputs.test_command == '' && needs.build-test-image.outputs.image_id != '' && needs.build-test-image.result == 'success')
+    steps:
     strategy:
       fail-fast: false
       matrix:
@@ -112,19 +113,14 @@ jobs:
       - name: Debugging Info
         run: |
           echo "Test Command: ${{ inputs.test_command }}"
-          echo "Image ID: ${{ needs.build-test-image.outputs.image_id }}"
-          echo "Image Build Result: ${{ needs.build-test-image.result }}"
       - name: Run specified test command or default test suites
         env:
           IMAGE_ID: ${{ needs.build-test-image.outputs.image_id }}
           TEST_CONTEXTS: ${{ inputs.test_contexts }}
         run: |
-          if [ -n "${{ inputs.test_command }}" ]; then
+          if [ "${{ inputs.test_command }}" != "" ]; then
             echo "Running specific test command: ${{ inputs.test_command }}"
-            docker run --rm -v $PWD:/workspace \
-              -w /workspace \
-              $IMAGE_ID \
-              bash -c "${{ inputs.test_command }}"
+            docker run --rm -v $PWD:/workspace -w /workspace $IMAGE_ID bash -c "${{ inputs.test_command }}"
           else
             echo "Running default test suites for suite ${{ matrix.test-suite }}"
             mkdir -p reports/${{ matrix.test-suite }}
