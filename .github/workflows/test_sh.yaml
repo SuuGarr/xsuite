@@ -109,10 +109,7 @@ jobs:
         test-suite: ${{ fromJson(inputs.suites) }}
     if: inputs.test_command != '' || (needs.build-test-image.outputs.image_id != '' && needs.build-test-image.result == 'success')
     steps:
-      - name: Debugging Info
-        run: |
-          echo "Test Command: ${{ inputs.test_command }}"
-      - name: Run specified test command or default test suites
+      - name: Run test command or default test suites
         env:
           IMAGE_ID: ${{ needs.build-test-image.outputs.image_id }}
           TEST_CONTEXTS: ${{ inputs.test_contexts }}
