@@ -83,9 +83,9 @@ jobs:
   image-sanity-checks:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: build-test-image
+    if: ${{ needs.build-test-image.outputs.image_id != '' }}
     env:
       image_id: ${{ needs.build-test-image.outputs.image_id }}
-    if: ${{ needs.build-test-image.outputs.image_id != '' }}
     steps:
       - name: CUDA/ROCm info
         if: ${{ env.with_gpu == 'true' }}
