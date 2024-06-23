@@ -100,14 +100,14 @@ jobs:
 
   # Run the tests for each repo in parallel in a test container
   run-tests:
-    runs-on: [self-hosted, "${{ inputs.platform }}" , "${{ inputs.test_command }}"]
+    runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [build-test-image, image-sanity-checks]
     timeout-minutes: 540
-    if: inputs.test_command != '' || (inputs.test_command == '' && needs.build-test-image.outputs.image_id != '' && needs.build-test-image.result == 'success')
     strategy:
       fail-fast: false
       matrix:
         test-suite: ${{ fromJson(inputs.suites) }}
+    if: inputs.test_command != '' || (needs.build-test-image.outputs.image_id != '' && needs.build-test-image.result == 'success')
     steps:
       - name: Debugging Info
         run: |
@@ -117,9 +117,9 @@ jobs:
           IMAGE_ID: ${{ needs.build-test-image.outputs.image_id }}
           TEST_CONTEXTS: ${{ inputs.test_contexts }}
         run: |
-          if [ "${{ inputs.test_command }}" != "" ]; then
+           if [ "${{ inputs.test_command }}" != "" ]; then
             echo "Running specific test command: ${{ inputs.test_command }}"
-            docker run --rm -v $PWD:/workspace -w /workspace $IMAGE_ID bash -c "${{ inputs.test_command }}"
+            pytest "${{ inputs.test_command }}" 
           else
             echo "Running default test suites for suite ${{ matrix.test-suite }}"
             mkdir -p reports/${{ matrix.test-suite }}
