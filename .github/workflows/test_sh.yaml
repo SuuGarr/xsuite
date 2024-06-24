@@ -59,7 +59,8 @@ jobs:
         uses: actions/checkout@v3
       - id: build-image
         name: Build the test image
-        env: export PYTEST_ADDOPTS="-v"
+        env:
+          PYTEST_ADDOPTS: "-v"
         run: |
           echo '${{ inputs.locations }}' | jq '.' > locations.json
           IMAGE="xsuite-test-runner-$(cat /proc/sys/kernel/random/uuid)"
@@ -124,6 +125,7 @@ jobs:
             -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
             ${image_id} \
             /opt/run_tests.sh /opt/xsuite/${{ matrix.test-suite }}/tests
+      shell: /usr/bin/bash -e {0}
 
   wait:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
