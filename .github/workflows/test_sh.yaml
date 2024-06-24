@@ -113,7 +113,7 @@ jobs:
         PYTEST_ADDOPTS: "${{ github.event.inputs.test_command }}" 
       run: |
         mkdir -p reports/${{ matrix.test-suite }}
-        if [[ -n "$TEST-COMMAND" ]]; then
+        if [[ -n "$PYTEST_ADDOPTS" ]]; then
           docker run --rm --gpus all\
             --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
             -e "PYTEST_ADDOPTS=${PYTEST_ADDOPTS}"  \
