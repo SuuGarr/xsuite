@@ -17,8 +17,13 @@ on:
         "xtrack_location":"xsuite:main",
         "xfields_location":"xsuite:main",
         "xmask_location":"xsuite:main",
-        "xcoll_location":"xsuite:main"}'
+        "xcoll_location":"xsuite:main",
+        "xboinc_location":"xsuite:main" }'
         required: true
+        type: string
+      test_command:
+        description: Path to test file
+        required: false
         type: string
       test_contexts:
         description: test contexts
@@ -32,7 +37,7 @@ on:
         description: test suites (JSON array string)
         required: false
         type: string
-        default: '["xobjects", "xdeps", "xpart", "xtrack", "xfields", "xmask", "xcoll"]'
+        default: '["xobjects", "xdeps", "xpart", "xtrack", "xfields", "xmask", "xcoll","xboinc"]'
 
 # This workflow calls the test_sh.yaml workflow passing the specified
 # branches as inputs
@@ -42,6 +47,7 @@ jobs:
     secrets: inherit
     with:
       locations: ${{ inputs.locations }}
+      test_command: ${{ inputs.test_command }}
       test_contexts: ${{ inputs.test_contexts }}
       platform: ${{ inputs.platform }}
       suites: ${{ inputs.suites }}

@@ -18,6 +18,10 @@ on:
         "xcoll_location":"xsuite:main"}'
         required: false
         type: string
+      test_command:
+        description: Path to test file
+        required: false
+        type: string
       test_contexts:
         required: false
         type: string
@@ -107,6 +111,12 @@ jobs:
         test_contexts: ${{ inputs.test_contexts }}
       run: |
         mkdir -p reports/${{ matrix.test-suite }}
+        TEST_COMMAND= ${{ inputs.test_commamd }}
+        if [[ -n "$TEST-COMMAND" ]]; then
+          test_path= "/opt/run_tests.sh /opt/xsuite/${ TEST_COMMAND }"
+        else
+          test_path= "/opt/run_tests.sh /opt/xsuite/${{ matrix.test-suite }}/tests"
+        fi
         docker run --rm --gpus all \
           --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
           -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
