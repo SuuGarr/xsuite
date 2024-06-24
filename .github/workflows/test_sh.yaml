@@ -129,7 +129,7 @@ jobs:
         run: |
           echo "Test Command: ${{ inputs.test_command }}"
       - name: Setup Python
-      - uses: actions/setup-python@v5
+        uses: actions/setup-python@v5
         with:
           python-version-file: './pyproject.toml'
       - name: Install dependencies
