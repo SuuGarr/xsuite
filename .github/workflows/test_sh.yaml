@@ -110,7 +110,7 @@ jobs:
         test_contexts: ${{ inputs.test_contexts }}
       run: |
         mkdir -p reports/${{ matrix.test-suite }}
-        TEST_COMMAND= ${{ github.event.inputs.test_commamd }}
+        TEST_COMMAND= ${{ inputs.test_commamd }}
         if [[ -n "$TEST-COMMAND" ]]; then
           docker run --rm --gpus all\
             --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
