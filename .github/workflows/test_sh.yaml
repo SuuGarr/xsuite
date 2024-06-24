@@ -47,7 +47,7 @@ jobs:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
       image_id: ${{ steps.build-image.outputs.image_id }}
-    if: ${{ inputs.test_command == '' }}
+    if: inputs.test_command == ''
     steps:
       - name: Install jq
         run: |
@@ -64,7 +64,7 @@ jobs:
         run: |
           echo '${{ inputs.locations }}' | jq '.' > locations.json
           IMAGE="xsuite-test-runner-$(cat /proc/sys/kernel/random/uuid)"
-          echo "::set-output name=image_id::$IMAGE"
+          echo "image_id=$IMAGE" >> $GITHUB_OUTPUT
           docker build \
             --network=host \
             --no-cache=true \
@@ -83,7 +83,7 @@ jobs:
   image-sanity-checks:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: build-test-image
-    if: ${{ needs.build-test-image.outputs.image_id != '' }}
+    if: needs.build-test-image.outputs.image_id != ''
     env:
       image_id: ${{ needs.build-test-image.outputs.image_id }}
     steps:
@@ -102,8 +102,8 @@ jobs:
   run-tests:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [build-test-image, image-sanity-checks]
-    timeout-minutes: 540
     if: (inputs.test_command == '' && needs.build-test-image.outputs.image_id != '' && needs.build-test-image.result == 'success')
+    timeout-minutes: 540
     strategy:
       fail-fast: false
       matrix:
@@ -120,30 +120,6 @@ jobs:
           -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
           ${image_id} \
           /opt/run_tests.sh /opt/xsuite/${{ matrix.test-suite }}/tests
-  run-tests-no-build:
-    runs-on: ${{ inputs.platform }}
-    if: inputs.test_command != '' 
-    timeout-minutes: 540
-    steps:
-      - name: Clean up before run
-        run: |
-          docker system prune -af
-          sudo rm -rf /var/tmp/*
-      - name: Debugging Info
-        run: |
-          echo "Test Command: ${{ inputs.test_command }}"
-      - name : Setup Python
-        uses: actions/setup-python@v5
-        with: 
-          python-version-file: './pyproject.toml'
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pytest
-      - name: Run specified test command
-        run: |
-          echo "Running specific test command: ${{ inputs.test_command }}"
-          ${{ inputs.test_command }}
 
   wait:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
@@ -158,24 +134,14 @@ jobs:
   teardown:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [build-test-image, wait]
-    if: always()
     env:
       image_id: ${{ needs.build-test-image.outputs.image_id }}
+    if: always()
     steps:
       - name: Stop the containers and remove the image
         run: |
-          CONTAINERS=$(docker ps -q --filter ancestor=${{ needs.build-test-image.outputs.image_id }} || true)
-          if [ -n "$CONTAINERS" ]; then
-            echo "Stopping containers: $CONTAINERS"
-            docker container stop $CONTAINERS
-            docker container rm --volumes $CONTAINERS
-          else
-            echo "No containers to stop."
-          fi
-          image_id=${{ needs.build-test-image.outputs.image_id }}
-          if [ -n "$image_id" ] && [ "$(docker images -q $image_id 2> /dev/null)" != "" ]; then
-            echo "Removing image: $image_id"
-            docker image rm $image_id
-          else
-            echo "No image to remove."
-          fi
+          docker container stop \
+            $(docker ps -q --filter ancestor=${image_id}) || true
+          docker container rm --volumes \
+            $(docker ps -qa --filter ancestor=${image_id}) || true
+          docker image rm ${image_id}
