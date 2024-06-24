@@ -103,7 +103,7 @@ jobs:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [build-test-image, image-sanity-checks]
     timeout-minutes: 540
-    if: ${{ inputs.test_command == '' }}
+    if: ${{ inputs.test_command == '' || (needs.build-test-image.outputs.image_id != '' && needs.build-test-image.result == 'success') }}
     strategy:
       fail-fast: false
       matrix:
@@ -122,8 +122,8 @@ jobs:
           /opt/run_tests.sh /opt/xsuite/${{ matrix.test-suite }}/tests
   
   run-tests-no-build:
-    if: ${{ inputs.test_command != '' }}
     runs-on: [self-hosted, "${{ inputs.platform }}"]
+    if: ${{ inputs.test_command != '' }}
     timeout-minutes: 540
     steps:
       - name: Debugging Info
@@ -132,8 +132,7 @@ jobs:
       - name : Setup Python
         uses: actions/setup-python@v5
         with: 
-        #  python-version-file: './pyproject.toml'
-          python-version: '3.12'
+          python-version-file: './pyproject.toml'
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
