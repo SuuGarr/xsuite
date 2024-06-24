@@ -103,7 +103,6 @@ jobs:
       fail-fast: false
       matrix:
         test-suite: ${{ fromJson(inputs.suites) }}
-
     steps:
     - name: Run pytest
       env:
@@ -113,7 +112,7 @@ jobs:
         mkdir -p reports/${{ matrix.test-suite }}
         TEST_COMMAND= ${{ inputs.test_commamd }}
         if [[ -n "$TEST-COMMAND" ]]; then
-          test_path= "/opt/run_tests.sh /opt/xsuite/${ TEST_COMMAND }"
+          test_path= "/opt/xsuite/$TEST_COMMAND"
         else
           test_path= "/opt/run_tests.sh /opt/xsuite/${{ matrix.test-suite }}/tests"
         fi
