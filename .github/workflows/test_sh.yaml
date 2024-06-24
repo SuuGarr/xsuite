@@ -137,22 +137,14 @@ jobs:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     if: ${{ inputs.test_command != '' }}
     timeout-minutes: 540
-    strategy:
-      matrix:
-        python-version:
-          - "3.8"
-          - "3.9"
-          - "3.10"
-          - "3.11"
-          - "3.12"
     steps:
       - name: Debugging Info
         run: |
           echo "Test Command: ${{ inputs.test_command }}"
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: '3.12'
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
