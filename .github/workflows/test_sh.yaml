@@ -47,7 +47,6 @@ jobs:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
       image_id: ${{ steps.build-image.outputs.image_id }}
-    if: inputs.test_command == ''
     steps:
       - name: Install jq
         run: |
@@ -83,7 +82,6 @@ jobs:
   image-sanity-checks:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: build-test-image
-    if: needs.build-test-image.outputs.image_id != ''
     env:
       image_id: ${{ needs.build-test-image.outputs.image_id }}
     steps:
@@ -102,12 +100,12 @@ jobs:
   run-tests:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [build-test-image, image-sanity-checks]
-    if: (inputs.test_command == '' && needs.build-test-image.outputs.image_id != '' && needs.build-test-image.result == 'success')
     timeout-minutes: 540
     strategy:
       fail-fast: false
       matrix:
         test-suite: ${{ fromJson(inputs.suites) }}
+
     steps:
     - name: Run pytest
       env:
