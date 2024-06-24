@@ -110,17 +110,19 @@ jobs:
         test_contexts: ${{ inputs.test_contexts }}
       run: |
         mkdir -p reports/${{ matrix.test-suite }}
-        TEST_COMMAND= ${{ inputs.test_commamd }}
+        TEST_COMMAND= ${{ github.event.inputs.test_commamd }}
         if [[ -n "$TEST-COMMAND" ]]; then
-          test_path= "/opt/xsuite/$TEST_COMMAND"
-        else
-          test_path= "/opt/run_tests.sh /opt/xsuite/${{ matrix.test-suite }}/tests"
-        fi
-        docker run --rm --gpus all \
-          --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
-          -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
-          ${image_id} \
-          /opt/run_tests.sh /opt/xsuite/${{ matrix.test-suite }}/tests
+          docker run --rm --gpus all\
+            --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
+            -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
+            ${image_id} \
+            sh -c "$TEST_COMMAND"
+        else 
+          docker run --rm --gpus all \
+            --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
+            -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
+            ${image_id} \
+            /opt/run_tests.sh /opt/xsuite/${{ matrix.test-suite }}/tests
 
   wait:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
