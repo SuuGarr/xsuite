@@ -103,7 +103,7 @@ jobs:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [build-test-image, image-sanity-checks]
     timeout-minutes: 540
-    if: ${{ inputs.test_command != '' || (needs.build-test-image.outputs.image_id != '' && needs.build-test-image.result == 'success') }}
+    if: ${{ inputs.test_command = '' }}
     strategy:
       fail-fast: false
       matrix:
@@ -122,8 +122,8 @@ jobs:
           /opt/run_tests.sh /opt/xsuite/${{ matrix.test-suite }}/tests
   
   run-tests-no-build:
-    runs-on: [self-hosted, "${{ inputs.platform }}"]
     if: ${{ inputs.test_command != '' }}
+    runs-on: [self-hosted, "${{ inputs.platform }}"]
     timeout-minutes: 540
     steps:
       - name: Debugging Info
