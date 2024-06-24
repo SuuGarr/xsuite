@@ -122,6 +122,7 @@ jobs:
           /opt/run_tests.sh /opt/xsuite/${{ matrix.test-suite }}/tests
   
   run-tests-no-build:
+    runs-on: ${{ inputs.platform }}
     if: inputs.test_command != '' 
     timeout-minutes: 540
     steps:
