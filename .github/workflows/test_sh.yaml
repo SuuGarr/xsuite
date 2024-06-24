@@ -109,25 +109,17 @@ jobs:
       matrix:
         test-suite: ${{ fromJson(inputs.suites) }}
     steps:
-      - name: Run test command or default test suites
-        env:
-          IMAGE_ID: ${{ needs.build-test-image.outputs.image_id }}
-          TEST_CONTEXTS: ${{ inputs.test_contexts }}
-        run: |
-          if [ -n "${{ inputs.test_command }}" ]; then
-            echo "Running specific test command: ${{ inputs.test_command }}"
-            docker run --rm -v $PWD:/workspace \
-              -w /workspace \
-              $IMAGE_ID \
-              bash -c "${{ inputs.test_command }}"
-          else
-            echo "Running default test suites for suite ${{ matrix.test-suite }}"
-            mkdir -p reports/${{ matrix.test-suite }}
-            docker run --rm --gpus all \
-              --env XOBJECTS_TEST_CONTEXTS="${TEST_CONTEXTS}" \
-              -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
-              $IMAGE_ID \
-              /opt/run_tests.sh /opt/xsuite/${{ matrix.test-suite }}/tests
+    - name: Run pytest
+      env:
+        image_id: ${{ needs.build-test-image.outputs.image_id }}
+        test_contexts: ${{ inputs.test_contexts }}
+      run: |
+        mkdir -p reports/${{ matrix.test-suite }}
+        docker run --rm --gpus all \
+          --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
+          -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
+          ${image_id} \
+          /opt/run_tests.sh /opt/xsuite/${{ matrix.test-suite }}/tests
   run-tests-no-build:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     if: ${{ inputs.test_command != '' }}
@@ -140,7 +132,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version-file: './pyproject.toml'
-          check-latest: true
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
