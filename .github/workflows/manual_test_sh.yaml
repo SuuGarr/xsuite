@@ -20,10 +20,6 @@ on:
         "xcoll_location":"xsuite:main"}'
         required: true
         type: string
-      test_command:
-        description: Path to test file
-        required: false
-        type: string
       test_contexts:
         description: test contexts
         default: 'ContextCpu;ContextCpu:auto;ContextCupy;ContextPyopencl'
