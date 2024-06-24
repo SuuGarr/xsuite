@@ -110,7 +110,7 @@ jobs:
       env:
         image_id: ${{ needs.build-test-image.outputs.image_id }}
         test_contexts: ${{ inputs.test_contexts }}
-        PYTEST_ADDOPTS: "${{ github.event.inputs.test_command }}" 
+        PYTEST_ADDOPTS: "${{ inputs.test_command }}" 
       run: |
         mkdir -p reports/${{ matrix.test-suite }}
         if [[ -n "$PYTEST_ADDOPTS" ]]; then
