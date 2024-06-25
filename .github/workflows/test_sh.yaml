@@ -113,13 +113,12 @@ jobs:
       env:
         image_id: ${{ needs.build-test-image.outputs.image_id }}
         test_contexts: ${{ inputs.test_contexts }}
-        PYTEST_ADDOPTS: "${{ inputs.test_command }}" 
       run: |
-        mkdir -p reports/${{ matrix.test-suite }}
-        if [[ -n "${{ env.PYTEST_ADDOPTS }}" ]]; then
+        mkdir -p reports/${{ inputs.test_command }}
+        if [[ -n "${{ inputs.test_command }}" ]]; then
           docker run --rm --gpus all\
             --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
-            -e "PYTEST_ADDOPTS=${{ env.PYTEST_ADDOPTS }}"  \
+            -e "PYTEST_ADDOPTS=${{ inputs.test_command }}"  \
             sh -c "/opt/run_tests.sh $PYTEST_ADDOPTS"
         else 
           docker run --rm --gpus all \
