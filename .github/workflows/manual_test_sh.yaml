@@ -22,7 +22,7 @@ on:
         required: true
         type: string
       test_command:
-        description: Path to test file
+        description: Command to run tests
         required: false
         type: string
       test_contexts:

@@ -9,7 +9,7 @@ on:
     inputs:
       locations:
         description: 'Branch locations (JSON array string)'
-        default: '{ "xobjects_location":"xsuite:main" ,
+        default: '{ "xobjects_location":"xsuite:main",
         "xdeps_location":"xsuite:main",
         "xpart_location":"xsuite:main",
         "xtrack_location":"xsuite:main",
@@ -20,7 +20,7 @@ on:
         required: false
         type: string
       test_command:
-        description: Path to test file
+        description: Command to run tests
         required: false
         type: string
       test_contexts:
@@ -67,14 +67,7 @@ jobs:
           docker build \
             --network=host \
             --no-cache=true \
-            --build-arg xobjects_branch=$(jq -r '.["xobjects_location"]' locations.json) \
-            --build-arg xdeps_branch=$(jq -r '.["xdeps_location"]' locations.json) \
-            --build-arg xpart_branch=$(jq -r '.["xpart_location"]' locations.json) \
-            --build-arg xtrack_branch=$(jq -r '.["xtrack_location"]' locations.json) \
-            --build-arg xfields_branch=$(jq -r '.["xfields_location"]' locations.json) \
-            --build-arg xmask_branch=$(jq -r '.["xmask_location"]' locations.json) \
-            --build-arg xcoll_branch=$(jq -r '.["xcoll_location"]' locations.json) \
-            --build-arg xboinc_branch=$(jq -r '.["xboinc_location"]' locations.json) \
+            $(jq -r 'to_entries | map("--build-arg " + .key + "=" + .value) | join(" ")' locations.json) \
             --build-arg with_gpu=${with_gpu} \
             -t $IMAGE .
 
