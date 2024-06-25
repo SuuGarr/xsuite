@@ -114,10 +114,11 @@ jobs:
       env:
         image_id: ${{ needs.build-test-image.outputs.image_id }}
         test_contexts: ${{ inputs.test_contexts }}
+        test_command: ${{ inputs.test_command }}
       run: |
-        if [[ -n "${{ inputs.test_command }}" != ""]]; then
+        if [[ -n "$test_command" != ""]]; then
           echo "Running pytest command..."
-          sh -c "pytest ${{ inputs.test_command }}"
+          sh -c "pytest $test_command"
         else 
           docker run --rm --gpus all \
             --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
