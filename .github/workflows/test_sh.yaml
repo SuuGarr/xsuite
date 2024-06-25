@@ -108,7 +108,6 @@ jobs:
     steps:
     - name: Run pytest
       env:
-        PYTEST_ADDOPTS: "-v"
         image_id: ${{ needs.build-test-image.outputs.image_id }}
         test_contexts: ${{ inputs.test_contexts }}
         test_command: ${{ inputs.test_command }}
