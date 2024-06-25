@@ -116,7 +116,6 @@ jobs:
         test_contexts: ${{ inputs.test_contexts }}
       run: |
         if [[ -n "${{ inputs.test_command }}" ]]; then
-          docker run --rm --gpus all\
             --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
             -e "PYTEST_ADDOPTS=${{ inputs.test_command }}"  \
             ${image_id} \
