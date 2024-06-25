@@ -15,7 +15,8 @@ on:
         "xtrack_location":"xsuite:main",
         "xfields_location":"xsuite:main",
         "xmask_location":"xsuite:main",
-        "xcoll_location":"xsuite:main"}'
+        "xcoll_location":"xsuite:main",
+        "xboinc_location":"xsuite:main" }'
         required: false
         type: string
       test_command:
@@ -33,7 +34,7 @@ on:
         description: a list of the suites to run as a JSON string
         required: false
         type: string
-        default: '["xobjects", "xdeps", "xpart", "xtrack", "xfields", "xcoll"]'
+        default: '["xobjects", "xdeps", "xpart", "xtrack", "xfields", "xcoll","xboinc"]'
 
 env:
   with_gpu: ${{ contains(inputs.test_contexts, 'Cupy') || contains(inputs.test_contexts, 'Pyopencl') }}
@@ -59,8 +60,6 @@ jobs:
         uses: actions/checkout@v3
       - id: build-image
         name: Build the test image
-        env:
-          PYTEST_ADDOPTS: "-v"
         run: |
           echo '${{ inputs.locations }}' | jq '.' > locations.json
           IMAGE="xsuite-test-runner-$(cat /proc/sys/kernel/random/uuid)"
@@ -75,6 +74,7 @@ jobs:
             --build-arg xfields_branch=$(jq -r '.["xfields_location"]' locations.json) \
             --build-arg xmask_branch=$(jq -r '.["xmask_location"]' locations.json) \
             --build-arg xcoll_branch=$(jq -r '.["xcoll_location"]' locations.json) \
+            --build-arg xboinc_branch=$(jq -r '.["xboinc_location"]' locations.json) \
             --build-arg with_gpu=${with_gpu} \
             -t $IMAGE .
 
@@ -110,22 +110,22 @@ jobs:
       env:
         image_id: ${{ needs.build-test-image.outputs.image_id }}
         test_contexts: ${{ inputs.test_contexts }}
+        PYTEST_ADDOPTS: "${{ github.event.inputs.test_command }}" 
       run: |
         mkdir -p reports/${{ matrix.test-suite }}
-        if [[ -n "${{ inputs.test_command }}" ]]; then
+        if [[ -n "${{ PYTEST_ADDOPTS }}" ]]; then
           docker run --rm --gpus all\
             --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
-            -e "PYTEST_ADDOPTS=${{ inputs.test_command }}"  \
+            -e "PYTEST_ADDOPTS=${{ PYTEST_ADDOPTS }}"  \
             -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
             ${image_id} \
-            sh -c "/opt/run_tests.sh ${{ inputs.test_command }}"
+            sh -c "/opt/run_tests.sh $PYTEST_ADDOPTS"
         else 
           docker run --rm --gpus all \
             --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
             -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
             ${image_id} \
             /opt/run_tests.sh /opt/xsuite/${{ matrix.test-suite }}/tests
-      shell: /usr/bin/bash -e {0}
 
   wait:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
