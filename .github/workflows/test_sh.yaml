@@ -134,7 +134,7 @@ jobs:
         if [[ -n "$test_command" ]]; then
           echo "Running pytest command..."
           /opt/run_tests.sh $test_command
-
+        fi
   wait:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [build-test-image, run-tests]
