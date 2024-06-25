@@ -118,7 +118,7 @@ jobs:
       run: |
         if [[ -n "$test_command" ]]; then
           echo "Running pytest command..."
-          pytest $test_command
+          /opt/run_tests.sh $test_command
         else 
           mkdir -p reports/${{ matrix.test-suite }}
           docker run --rm --gpus all \
