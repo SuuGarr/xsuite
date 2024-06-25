@@ -116,9 +116,9 @@ jobs:
         test_contexts: ${{ inputs.test_contexts }}
         test_command: ${{ inputs.test_command }}
       run: |
-        if [[ -n "$test_command" != ""]]; then
+        if [[ -n "$test_command" ]]; then
           echo "Running pytest command..."
-          sh -c "pytest $test_command"
+          pytest $test_command
         else 
           mkdir -p reports/${{ matrix.test-suite }}
           docker run --rm --gpus all \
