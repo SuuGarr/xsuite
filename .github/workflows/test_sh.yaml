@@ -60,6 +60,8 @@ jobs:
         uses: actions/checkout@v3
       - id: build-image
         name: Build the test image
+        env:
+          PYTEST_ADDOPTS: "-v"
         run: |
           echo '${{ inputs.locations }}' | jq '.' > locations.json
           IMAGE="xsuite-test-runner-$(cat /proc/sys/kernel/random/uuid)"
@@ -67,7 +69,14 @@ jobs:
           docker build \
             --network=host \
             --no-cache=true \
-            $(jq -r 'to_entries | map("--build-arg " + .key + "=" + .value) | join(" ")' locations.json) \
+            --build-arg xobjects_branch=$(jq -r '.["xobjects_location"]' locations.json) \
+            --build-arg xdeps_branch=$(jq -r '.["xdeps_location"]' locations.json) \
+            --build-arg xpart_branch=$(jq -r '.["xpart_location"]' locations.json) \
+            --build-arg xtrack_branch=$(jq -r '.["xtrack_location"]' locations.json) \
+            --build-arg xfields_branch=$(jq -r '.["xfields_location"]' locations.json) \
+            --build-arg xmask_branch=$(jq -r '.["xmask_location"]' locations.json) \
+            --build-arg xcoll_branch=$(jq -r '.["xcoll_location"]' locations.json) \
+            --build-arg xboinc_branch=$(jq -r '.["xboinc_location"]' locations.json) \
             --build-arg with_gpu=${with_gpu} \
             -t $IMAGE .
 
@@ -110,8 +119,6 @@ jobs:
           docker run --rm --gpus all\
             --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
             -e "PYTEST_ADDOPTS=${{ env.PYTEST_ADDOPTS }}"  \
-            -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
-            ${image_id} \
             sh -c "/opt/run_tests.sh $PYTEST_ADDOPTS"
         else 
           docker run --rm --gpus all \
