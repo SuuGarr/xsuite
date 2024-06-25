@@ -103,6 +103,7 @@ jobs:
   run-tests:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [build-test-image, image-sanity-checks]
+    if: ${{ needs.build-test-image.outputs.image_id != '' || inputs.test_command != '' }}
     timeout-minutes: 540
     strategy:
       fail-fast: false
@@ -114,11 +115,11 @@ jobs:
         image_id: ${{ needs.build-test-image.outputs.image_id }}
         test_contexts: ${{ inputs.test_contexts }}
       run: |
-        mkdir -p reports/${{ inputs.test_command }}
         if [[ -n "${{ inputs.test_command }}" ]]; then
           docker run --rm --gpus all\
             --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
             -e "PYTEST_ADDOPTS=${{ inputs.test_command }}"  \
+            ${image_id} \
             sh -c "/opt/run_tests.sh $PYTEST_ADDOPTS"
         else 
           docker run --rm --gpus all \
