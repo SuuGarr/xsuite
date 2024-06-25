@@ -60,7 +60,9 @@ jobs:
         uses: actions/checkout@v3
       - id: build-image
         name: Build the test image
-        if: ${{ inputs.test_command == '' }}
+    #    if: ${{ inputs.test_command == '' }}
+        env:
+          PYTEST_ADDOPTS: "-v"
         run: |
           echo '${{ inputs.locations }}' | jq '.' > locations.json
           IMAGE="xsuite-test-runner-$(cat /proc/sys/kernel/random/uuid)"
@@ -76,6 +78,7 @@ jobs:
             --build-arg xmask_branch=$(jq -r '.["xmask_location"]' locations.json) \
             --build-arg xcoll_branch=$(jq -r '.["xcoll_location"]' locations.json) \
             --build-arg xboinc_branch=$(jq -r '.["xboinc_location"]' locations.json) \
+            --build-arg PYTEST_ADDOPTS="${{ inputs.test_command }}"
             --build-arg with_gpu=${with_gpu} \
             -t $IMAGE .
 
@@ -102,7 +105,7 @@ jobs:
   run-tests:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [build-test-image, image-sanity-checks]
-    if: ${{ inputs.test_command != '' }}
+    if: ${{ needs.build-test-image.outputs.image_id != '' || inputs.test_command != '' }}
     timeout-minutes: 540
     strategy:
       fail-fast: false
