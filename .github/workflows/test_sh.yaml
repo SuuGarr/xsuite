@@ -117,10 +117,9 @@ jobs:
         if [[ -n "$test_command" ]]; then
           docker run --rm --gpus all \
             --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
-            -e "PYTEST_ADDOPTS=${{ env.PYTEST_ADDOPTS }}" \
             -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
             ${image_id} \
-            sh -c "//opt/run_tests.sh ${{ env.PYTEST_ADDOPTS }} $test_command  "
+            sh -c "//opt/run_tests.sh $test_command  "
         else 
           docker run --rm --gpus all \
             --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
