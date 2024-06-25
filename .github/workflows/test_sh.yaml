@@ -121,19 +121,19 @@ jobs:
           ${image_id} \
           /opt/run_tests.sh /opt/xsuite/${{ matrix.test-suite }}/tests
 
-    run-tests_command:
-      runs-on: [self-hosted, "${{ inputs.platform }}"]
-      if: ${{ inputs.test_command != '' }}
-      timeout-minutes: 540
-      steps:
-      - name: Run pytest command
-        env:
-          PYTEST_ADDOPTS: "-v"
-          test_command: ${{ inputs.test_command }}
-        run: |
-          if [[ -n "$test_command" ]]; then
-            echo "Running pytest command..."
-            /opt/run_tests.sh $test_command
+  run-tests_command:
+    runs-on: [self-hosted, "${{ inputs.platform }}"]
+    if: ${{ inputs.test_command != '' }}
+    timeout-minutes: 540
+    steps:
+    - name: Run pytest command
+      env:
+        PYTEST_ADDOPTS: "-v"
+        test_command: ${{ inputs.test_command }}
+      run: |
+        if [[ -n "$test_command" ]]; then
+          echo "Running pytest command..."
+          /opt/run_tests.sh $test_command
 
   wait:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
