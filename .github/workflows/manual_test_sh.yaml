@@ -19,7 +19,11 @@ on:
         "xmask_location":"xsuite:main",
         "xcoll_location":"xsuite:main",
         "xboinc_location":"xsuite:main" }'
-        required: true
+        required: false
+        type: string
+      test_command:
+        description: Command to run tests
+        required: false
         type: string
       test_contexts:
         description: test contexts
@@ -31,7 +35,7 @@ on:
         required: true
       suites:
         description: test suites (JSON array string)
-        required: true
+        required: false
         type: string
         default: '["xobjects", "xdeps", "xpart", "xtrack", "xfields", "xmask", "xcoll","xboinc"]'
 
@@ -43,6 +47,7 @@ jobs:
     secrets: inherit
     with:
       locations: ${{ inputs.locations }}
+      test_command: ${{ inputs.test_command }}
       test_contexts: ${{ inputs.test_contexts }}
       platform: ${{ inputs.platform }}
       suites: ${{ inputs.suites }}

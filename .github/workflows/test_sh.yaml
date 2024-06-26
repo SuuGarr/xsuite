@@ -19,6 +19,10 @@ on:
         "xboinc_location":"xsuite:main" }'
         required: false
         type: string
+      test_command:
+        description: Command to run tests
+        required: true
+        type: string
       test_contexts:
         required: false
         type: string
@@ -107,13 +111,15 @@ jobs:
       env:
         image_id: ${{ needs.build-test-image.outputs.image_id }}
         test_contexts: ${{ inputs.test_contexts }}
+        test_command: ${{ inputs.test_command }}
       run: |
-        mkdir -p reports/${{ matrix.test-suite }}
-        docker run --rm --gpus all \
-          --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
-          -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
-          ${image_id} \
-          /opt/run_tests.sh /opt/xsuite/${{ matrix.test-suite }}/tests
+          mkdir -p reports/${{ matrix.test-suite }}
+          docker run --rm --gpus all \
+            --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
+            --env PYTEST_ADDOPTS= "${{ test_command }}" \
+            -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
+            ${image_id} \
+            /opt/run_tests.sh /opt/xsuite/${{ matrix.test-suite }}/tests
 
   wait:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
