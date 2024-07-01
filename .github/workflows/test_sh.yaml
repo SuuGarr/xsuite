@@ -48,6 +48,7 @@ jobs:
     with:
       platform: ${{ inputs.platform }}
       locations: ${{ inputs.locations }}
+      pytest_options: ${{ inputs.pytest_options }}
 
   load-image:
     needs: trigger-build-image
