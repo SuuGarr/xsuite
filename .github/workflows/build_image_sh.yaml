@@ -43,6 +43,10 @@ jobs:
     outputs:
       image_id: ${{ steps.build-image.outputs.image_id }}
     steps:
+      - id: checkout-repo
+        name: Checkout the repo
+        uses: actions/checkout@v3
+        
       - name: Install jq
         run: |
           if command -v apt-get &> /dev/null; then
@@ -50,9 +54,7 @@ jobs:
           else command -v yum &> /dev/null; 
             sudo yum install -y jq
           fi
-      - id: checkout-repo
-        name: Checkout the repo
-        uses: actions/checkout@v3
+
       - id: build-image
         name: Build the test image
         run: |
