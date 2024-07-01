@@ -1,3 +1,4 @@
+#This is a build image workflow for testing (self-hosted runner based) 
 name: Build Docker Image for Testing
 
 # Controls when the action will run. This is a reusable workflow.
@@ -46,7 +47,7 @@ jobs:
       - id: checkout-repo
         name: Checkout the repo
         uses: actions/checkout@v3
-        
+
       - name: Install jq
         run: |
           if command -v apt-get &> /dev/null; then
