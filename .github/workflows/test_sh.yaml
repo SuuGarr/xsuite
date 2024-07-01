@@ -63,7 +63,7 @@ jobs:
           with:
             name: docker-image
             path: docker-image
-            
+
         - name: Load Docker image
           run: |
             image_id=$(gzip -dc docker-image/*.tar.gz | docker load | cut -d ' ' -f 3)
@@ -74,7 +74,7 @@ jobs:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: build-test-image
     env:
-      image_id: ${{ needs.load-image.outputs.image_id }}
+      image_id: ${{ needs.build-and-upload.outputs.image_id }}
     steps:
       - name: CUDA/ROCm info
         if: ${{ env.with_gpu == 'true' }}
@@ -100,7 +100,7 @@ jobs:
     steps:
     - name: Run pytest
       env:
-        image_id: ${{ needs.load-image.outputs.image_id }}
+        image_id: ${{ needs.build-and-upload.outputs.image_id }}
         test_contexts: ${{ inputs.test_contexts }}
         pytest_options: ${{ inputs.pytest_options }}
       run: |
@@ -126,7 +126,7 @@ jobs:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [build-test-image, wait]
     env:
-      image_id: ${{ needs.laod-image.outputs.image_id }}
+      image_id: ${{ needs.build-and-upload.outputs.image_id }}
     if: always()
     steps:
       - name: Stop the containers and remove the image
