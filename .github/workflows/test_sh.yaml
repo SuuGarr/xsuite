@@ -78,14 +78,14 @@ jobs:
     steps:
       - name: CUDA/ROCm info
         if: ${{ env.with_gpu == 'true' }}
-        run: docker run --rm --gpus all ${image_id} bash -c "nvidia-smi || rocm-smi"
+        run: docker run --rm --gpus all ${{env.image_id}} bash -c "nvidia-smi || rocm-smi"
       - name: OpenCL info
         if: ${{ env.with_gpu == 'true' }}
-        run: docker run --rm --gpus all ${image_id} clinfo
+        run: docker run --rm --gpus all ${{env.image_id}} clinfo
       - name: Package paths
-        run: docker run --rm --gpus all ${image_id} python3 /opt/xsuite/xtrack/examples/print_package_paths.py
+        run: docker run --rm --gpus all ${{env.image_id}} python3 /opt/xsuite/xtrack/examples/print_package_paths.py
       - name: List dependencies
-        run: docker run --rm --gpus all ${image_id} pip freeze
+        run: docker run --rm --gpus all ${{env.image_id}} pip freeze
 
   # Run the tests for each repo in parallel in a test container
   run-tests:
@@ -100,7 +100,6 @@ jobs:
     steps:
     - name: Run pytest
       env:
-        image_id: ${{ needs.build-image.outputs.image_id }}
         test_contexts: ${{ inputs.test_contexts }}
         pytest_options: ${{ inputs.pytest_options }}
       run: |
@@ -109,7 +108,7 @@ jobs:
             --env XOBJECTS_TEST_CONTEXTS="${test_contexts}" \
             --env PYTEST_ADDOPTS="${pytest_options}" \
             -v $PWD/reports/${{ matrix.test-suite }}:/opt/reports:Z \
-            ${image_id} \
+            ${{ env.image_id }} \
             /opt/run_tests.sh /opt/xsuite/${{ matrix.test-suite }}/tests
 
   wait:
@@ -125,14 +124,12 @@ jobs:
   teardown:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [build-test-image, wait]
-    env:
-      image_id: ${{ needs.build-image.outputs.image_id }}
     if: always()
     steps:
       - name: Stop the containers and remove the image
         run: |
           docker container stop \
-            $(docker ps -q --filter ancestor=${image_id}) || true
+            $(docker ps -q --filter ancestor=${{env.image_id}}) || true
           docker container rm --volumes \
-            $(docker ps -qa --filter ancestor=${image_id}) || true
-          docker image rm ${image_id}
+            $(docker ps -qa --filter ancestor=${{env.image_id}}) || true
+          docker image rm ${{env.image_id}}
