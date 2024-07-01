@@ -42,36 +42,39 @@ env:
 # The jobs are all run in independent environments. Here we will run a separate job
 # for each of the test suites specified in the matrix below.
 jobs:
-  load-image:
-    runs-on: [self-hosted, "${{ inputs.platform }}"]
-    needs: build-and-upload 
-    steps:
-      - name: Trigger build workflow
-        uses: ./.github/workflows/build_image_sh.yaml
-        with:
-          locations: ${{ inputs.locations }}
-          pytest_options: ${{ inputs.pytest_options }}
-          test_contexts: ${{ inputs.test_contexts }}
-          platform: ${{ inputs.platform }}
-          suites: ${{ inputs.suites }}
 
+  trigger-build-image:
+    uses: ./.github/workflows/build_image_sh.yaml
+    with:
+      platform: ${{ inputs.platform }}
+      locations: ${{ inputs.locations }}
+      pytest_options: ${{ inputs.pytest_options }}
+
+  load-image:
+    needs: trigger-build-image
+    runs-on: [self-hosted, "${{ inputs.platform }}"]
+    outputs:
+      image_id: ${{ steps.load-image.outputs.image_id }}
+    steps:
       - name: Download Docker image artifact
+        id: get-artifact
         uses: actions/upload-artifact@v4
         with:
           name: docker-image
           path: docker-image
-          
+
       - name: Load Docker image
+        id: load-image
         run: |
           image_id=$(gzip -dc docker-image/*.tar.gz | docker load | cut -d ' ' -f 3)
-          echo "image_id=$IMAGE" >> $GITHUB_ENV   
+          echo "::set-output name=image_id::$image_id"
       
   # Print out some stuff about the test environment
   image-sanity-checks:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
-    needs: build-test-image
-    env:
-      image_id: ${{ needs.build-test-image.outputs.image_id }}
+    needs: load-image
+    env: 
+      image_id: ${{ needs.load-image.outputs.image_id }}
     steps:
       - name: CUDA/ROCm info
         if: ${{ env.with_gpu == 'true' }}
@@ -87,17 +90,16 @@ jobs:
   # Run the tests for each repo in parallel in a test container
   run-tests:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
-    needs: [build-test-image, image-sanity-checks]
+    needs: [load-image, image-sanity-checks]
     timeout-minutes: 540
     strategy:
       fail-fast: false
       matrix:
         test-suite: ${{ fromJson(inputs.suites) }}
-
     steps:
     - name: Run pytest
       env:
-        image_id: ${{ needs.build-test-image.outputs.image_id }}
+        image_id: ${{ needs.load-image.outputs.image_id }}
         test_contexts: ${{ inputs.test_contexts }}
         pytest_options: ${{ inputs.pytest_options }}
       run: |
@@ -111,7 +113,7 @@ jobs:
 
   wait:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
-    needs: [build-test-image, run-tests]
+    needs: [load-image, run-tests]
     if: success() || failure()
     steps:
       - name: Wait
@@ -121,9 +123,9 @@ jobs:
   # no unused images and stopped containers
   teardown:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
-    needs: [build-test-image, wait]
-    env:
-      image_id: ${{ needs.build-test-image.outputs.image_id }}
+    needs: [load-image, wait]
+    env: 
+      image_id: ${{ needs.load-image.outputs.image_id }}
     if: always()
     steps:
       - name: Stop the containers and remove the image
@@ -131,5 +133,5 @@ jobs:
           docker container stop \
             $(docker ps -q --filter ancestor=${image_id}) || true
           docker container rm --volumes \
-            $(docker ps -qa --filter ancestor=${image_id}) || true
+            $(docker ps -qa --filter ancestor=${image_id}}) || true
           docker image rm ${image_id}
