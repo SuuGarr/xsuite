@@ -52,7 +52,7 @@ jobs:
         with:
           workflow: "Build Docker Image for Testing"
           token: ${{ secrets.GITHUB_TOKEN }}
-          inputs: '{"platform": "${{ inputs.platform }}", "locations": "${{ inputs.locations }}"}'
+          inputs: "{\"platform\": \"${{ inputs.platform }}\", \"locations\": \"${{ inputs.locations }}\"}"
 
       - name: Download Docker image artifact
         id: get-artifact
