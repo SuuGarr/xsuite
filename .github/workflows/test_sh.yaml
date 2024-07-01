@@ -42,28 +42,18 @@ env:
 # The jobs are all run in independent environments. Here we will run a separate job
 # for each of the test suites specified in the matrix below.
 jobs:
-  build-image:
-    runs-on: [self-hosted, "${{ inputs.platform }}"]
-    outputs:
-      image_id: ${{ steps.build-image.outputs.image_id }}
-    uses: ./.github/workflows/build_image_sh.yaml
-    with:
-      locations: ${{ inputs.locations }}
-      pytest_options: ${{ inputs.pytest_options }}
-      test_contexts: ${{ inputs.test_contexts }}
-      platform: ${{ inputs.platform }}
-      suites: ${{ inputs.suites }}
   
   load-image:
-      needs: build-image
       runs-on: [self-hosted, "${{ inputs.platform }}"]
+      uses: ./.github/workflows/build_image_sh.yaml
+      outputs:
+        image_id: ${{ steps.load-image.outputs.image_id }}
       step:
         - name: Download Docker image artifact
           uses: actions/upload-artifact@v4
           with:
             name: docker-image
             path: docker-image
-          
         - name: Load Docker image
           run: |
             image_id=$(gzip -dc docker-image/*.tar.gz | docker load | cut -d ' ' -f 3)
@@ -100,7 +90,7 @@ jobs:
     steps:
     - name: Run pytest
       env:
-        image_id: ${{ needs.build-test-image.outputs.image_id }}
+        image_id: ${{ needs.load-image.outputs.image_id }}
         test_contexts: ${{ inputs.test_contexts }}
         pytest_options: ${{ inputs.pytest_options }}
       run: |
@@ -126,7 +116,7 @@ jobs:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [build-test-image, wait]
     env:
-      image_id: ${{ needs.build-test-image.outputs.image_id }}
+      image_id: ${{ needs.laod-image.outputs.image_id }}
     if: always()
     steps:
       - name: Stop the containers and remove the image
