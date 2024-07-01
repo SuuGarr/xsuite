@@ -42,13 +42,10 @@ env:
 # The jobs are all run in independent environments. Here we will run a separate job
 # for each of the test suites specified in the matrix below.
 jobs:
-  
   load-image:
       runs-on: [self-hosted, "${{ inputs.platform }}"]
       uses: ./.github/workflows/build_image_sh.yaml
-      outputs:
-        image_id: ${{ steps.load-image.outputs.image_id }}
-      step:
+      steps:
         - name: Download Docker image artifact
           uses: actions/upload-artifact@v4
           with:
