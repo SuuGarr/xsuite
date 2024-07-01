@@ -45,10 +45,6 @@ jobs:
   load-image:
       runs-on: [self-hosted, "${{ inputs.platform }}"]
       steps:
-        - id: checkout-repo
-          name: Checkout the repo
-          uses: actions/checkout@v3
-        
         - name: Trigger build workflow
           uses: ./.github/workflows/build_image_sh.yaml
           with: 
