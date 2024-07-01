@@ -70,8 +70,6 @@ jobs:
   image-sanity-checks:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: load-image
-    env: 
-      image_id: ${{ steps.build-image.outputs.image_id }}
     steps:
       - name: CUDA/ROCm info
         if: ${{ env.with_gpu == 'true' }}
@@ -97,7 +95,6 @@ jobs:
     steps:
     - name: Run pytest
       env:
-        image_id: ${{ steps.build-image.outputs.image_id }}
         test_contexts: ${{ inputs.test_contexts }}
         pytest_options: ${{ inputs.pytest_options }}
       run: |
@@ -122,8 +119,6 @@ jobs:
   teardown:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [load-image, wait]
-    env: 
-      image_id: ${{ steps.build-image.outputs.image_id }}
     if: always()
     steps:
       - name: Stop the containers and remove the image
