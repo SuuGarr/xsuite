@@ -44,13 +44,26 @@ env:
 jobs:
   load-image:
       runs-on: [self-hosted, "${{ inputs.platform }}"]
-      uses: ./.github/workflows/build_image_sh.yaml
       steps:
+        - id: checkout-repo
+          name: Checkout the repo
+          uses: actions/checkout@v3
+        
+        - name: Trigger build workflow
+          uses: ./.github/workflows/build_image_sh.yaml
+          with: 
+            locations: ${{ inputs.locations }}
+            pytest_options: ${{ inputs.pytest_options }}
+            test_contexts: ${{ inputs.test_contexts }}
+            platform: ${{ inputs.platform }}
+            suites: ${{ inputs.suites }}
+
         - name: Download Docker image artifact
           uses: actions/upload-artifact@v4
           with:
             name: docker-image
             path: docker-image
+            
         - name: Load Docker image
           run: |
             image_id=$(gzip -dc docker-image/*.tar.gz | docker load | cut -d ' ' -f 3)
