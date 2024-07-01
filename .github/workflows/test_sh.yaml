@@ -54,17 +54,17 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           inputs: '{"platform": "${{ inputs.platform }}", "locations": "${{ inputs.locations }}"}'
 
-        - name: Download Docker image artifact
-          id: get-artifact
-          uses: actions/upload-artifact@v4
-          with:
-            name: docker-image
-            path: docker-image
+      - name: Download Docker image artifact
+        id: get-artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: docker-image
 
-        - name: Load Docker image
-          run: |
-            image_id=$(gzip -dc docker-image/*.tar.gz | docker load | cut -d ' ' -f 3)
-            echo "image_id=$IMAGE" >> $GITHUB_ENV   
+      - name: Load Docker image
+        run: |
+          image_id=$(gzip -dc docker-image/*.tar.gz | docker load | cut -d ' ' -f 3)
+          echo "image_id=$IMAGE" >> $GITHUB_ENV   
       
   # Print out some stuff about the test environment
   image-sanity-checks:
