@@ -43,16 +43,14 @@ env:
 # for each of the test suites specified in the matrix below.
 jobs:
 
-  trigger-build-and-load:
+  trigger-build-image:
     uses: ./.github/workflows/build_image_sh.yaml
     with:
       platform: ${{ inputs.platform }}
       locations: ${{ inputs.locations }}
-    outputs:
-      image_id: ${{ steps.build-image.outputs.image_id }}
 
   load-image:
-    needs: trigger-build-and-load
+    needs: trigger-build-image
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     steps:
       - name: Download Docker image artifact
