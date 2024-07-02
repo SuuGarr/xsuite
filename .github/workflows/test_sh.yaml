@@ -54,7 +54,7 @@ jobs:
     needs: trigger-build-image
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
-      image_id: ${{ steps.download-image.outputs.image_id }}
+      image_id: ${{ steps.load-image.outputs.image_id }}
     steps:
       - name: Checkout the repo
         id: checkout-repo
@@ -78,7 +78,7 @@ jobs:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: download-image
     env: 
-      image_id: ${{ needs.download-image.outputs.image_id }}
+      image_id: ${{ needs.load-image.outputs.image_id }}
     steps:
       - name: CUDA/ROCm info
         if: ${{ env.with_gpu == 'true' }}
@@ -103,7 +103,7 @@ jobs:
     steps:
     - name: Run pytest
       env:
-        image_id: ${{ needs.download-image.outputs.image_id }}
+        image_id: ${{ needs.load-image.outputs.image_id }}
         test_contexts: ${{ inputs.test_contexts }}
         pytest_options: ${{ inputs.pytest_options }}
       run: |
@@ -129,7 +129,7 @@ jobs:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [download-image, wait]
     env: 
-      image_id: ${{ needs.download-image.outputs.image_id }}
+      image_id: ${{ needs.load-image.outputs.image_id }}
     if: always()
     steps:
       - name: Stop the containers and remove the image
