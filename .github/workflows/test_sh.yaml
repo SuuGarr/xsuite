@@ -56,6 +56,10 @@ jobs:
     outputs:
       image_id: ${{ steps.download-image.outputs.image_id }}
     steps:
+      - name: Checkout the repo
+        id: checkout-repo
+        uses: actions/checkout@v3
+
       - name: Download Docker image artifact
         id: get-artifact
         uses: actions/download-artifact@v4
