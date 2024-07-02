@@ -42,7 +42,6 @@ env:
 # The jobs are all run in independent environments. Here we will run a separate job
 # for each of the test suites specified in the matrix below.
 jobs:
-
   trigger-build-image:
     uses: ./.github/workflows/build_image_sh.yaml
     with:
@@ -71,6 +70,7 @@ jobs:
         id: load-image
         run: |
           IMAGE=$(gzip -dc docker-image/*.tar.gz | docker load | cut -d ' ' -f 3)
+          docker tag $IMAGE docker-image:latest
           echo "image_id=$IMAGE" >> $GITHUB_OUTPUT
       
   # Print out some stuff about the test environment
