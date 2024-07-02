@@ -71,8 +71,7 @@ jobs:
         run: |
           IMAGE=$(gzip -dc docker-image/*.tar.gz | docker load | cut -d ' ' -f 3)
           echo "Loaded Image: $IMAGE"
-          docker tag $IMAGE
-        # echo "image_id=$IMAGE" >> $GITHUB_OUTPUT
+          echo "image_id=$IMAGE" >> $GITHUB_OUTPUT
       
   # Print out some stuff about the test environment
   image-sanity-checks:
