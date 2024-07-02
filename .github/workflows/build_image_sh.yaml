@@ -22,6 +22,7 @@ on:
         description: Command to run tests
         required: true
         type: string
+        default: ''
       test_contexts:
         required: false
         type: string
@@ -36,7 +37,7 @@ on:
         default: '["xobjects", "xdeps", "xpart", "xtrack", "xfields", "xcoll"]'
 
 env:
-  with_gpu: ${{ contains(inputs.test_contexts, 'Cupy') || contains(inputs.test_contexts, 'Pyopencl') }}
+  with_gpu: ${{ contains(inputs.test_contexts, 'ContextCupy') || contains(inputs.test_contexts, 'ContextPyopencl') }}
 
 jobs:
   build-and-upload:
