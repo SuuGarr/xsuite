@@ -26,7 +26,7 @@ on:
       test_contexts:
         required: false
         type: string
-        default: 'ContextCpu;ContextCpu:auto;ContextCupy;ContextPyopencl'
+        default: 'ContextCupy'
       platform:
         required: true
         type: string
@@ -49,6 +49,7 @@ jobs:
       platform: ${{ inputs.platform }}
       locations: ${{ inputs.locations }}
       pytest_options: ${{ inputs.pytest_options }}
+      test_contexts: ${{ inputs.test_contexts }}
 
   download-image:
     needs: trigger-build-image

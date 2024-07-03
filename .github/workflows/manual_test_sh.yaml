@@ -28,7 +28,7 @@ on:
       test_contexts:
         required: false
         type: string
-        default: 'ContextCpu;ContextCpu:auto;ContextCupy;ContextPyopencl'
+        default: 'ContextCpu'
       platform:
         description: platform
         default: 'ubuntu'
