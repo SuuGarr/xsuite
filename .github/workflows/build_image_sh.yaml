@@ -22,6 +22,7 @@ on:
         description: Command to run tests
         required: true
         type: string
+        default: ''
       test_contexts:
         required: false
         type: string
