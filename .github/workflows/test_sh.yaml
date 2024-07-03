@@ -26,7 +26,7 @@ on:
       test_contexts:
         required: false
         type: string
-        default: 'ContextCupy'
+        default: 'ContextCpu;ContextCpu:auto;ContextCupy;ContextPyopencl'
       platform:
         required: true
         type: string
@@ -37,7 +37,7 @@ on:
         default: '["xobjects", "xdeps", "xpart", "xtrack", "xfields", "xcoll"]'
 
 env:
-  with_gpu: ${{ contains(inputs.test_contexts, 'Cupy') || contains(inputs.test_contexts, 'Pyopencl') }}
+  with_gpu: ${{ contains(inputs.test_contexts, 'ContextCupy') || contains(inputs.test_contexts, 'ContextPyopencl') }}
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 # The jobs are all run in independent environments. Here we will run a separate job
