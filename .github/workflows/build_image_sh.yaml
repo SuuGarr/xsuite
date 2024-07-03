@@ -23,18 +23,9 @@ on:
         required: true
         type: string
         default: ''
-      test_contexts:
-        required: false
-        type: string
-        default: 'ContextCpu;ContextCpu:auto;ContextCupy;ContextPyopencl'
       platform:
         required: true
         type: string
-      suites:
-        description: a list of the suites to run as a JSON string
-        required: false
-        type: string
-        default: '["xobjects", "xdeps", "xpart", "xtrack", "xfields", "xcoll"]'
 
 env:
   with_gpu: ${{ contains(inputs.test_contexts, 'ContextCupy') || contains(inputs.test_contexts, 'ContextPyopencl') }}

@@ -48,9 +48,8 @@ jobs:
     with:
       locations: ${{ inputs.locations }}
       pytest_options: ${{ inputs.pytest_options }}
-      test_contexts: ${{ inputs.test_contexts }}
       platform: ${{ inputs.platform }}
-      suites: ${{ inputs.suites }}
+
 
   download-image:
     needs: trigger-build-image
