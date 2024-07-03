@@ -23,6 +23,10 @@ on:
         required: true
         type: string
         default: ''
+      test_contexts:
+        required: false
+        type: string
+        default: 'ContextCpu;ContextCpu:auto;ContextCupy;ContextPyopencl'
       platform:
         required: true
         type: string
