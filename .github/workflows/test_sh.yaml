@@ -42,6 +42,10 @@ env:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 # The jobs are all run in independent environments. Here we will run a separate job
 # for each of the test suites specified in the matrix below.
+
+# This workflow calls build_image_sh.yaml workflow passing the specified
+# The Job Trigger and Download image from GitHub Artifact 
+# branches as inputs
 jobs:
   trigger-build-image:
     uses: ./.github/workflows/build_image_sh.yaml
