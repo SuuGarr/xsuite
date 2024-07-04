@@ -30,6 +30,9 @@ on:
 env:
   with_gpu: ${{ contains(inputs.test_contexts, 'ContextCupy') || contains(inputs.test_contexts, 'ContextPyopencl') }}
 
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+# The jobs are all run in independent environments. Here we will run a separate job
+# The jobs upload image to GitHub Artifact 
 jobs:
   build-and-upload:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
