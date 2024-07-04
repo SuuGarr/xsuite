@@ -22,6 +22,7 @@ on:
         description: Command to run tests
         required: false
         type: string
+        default: ''
       test_contexts:
         required: false
         type: string
@@ -41,21 +42,27 @@ env:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 # The jobs are all run in independent environments. Here we will run a separate job
 # for each of the test suites specified in the matrix below.
-jobs:
 
+# This workflow calls build_image_sh.yaml workflow passing the specified
+# The Job Trigger and Download image from GitHub Artifact 
+# branches as inputs
+jobs:
   trigger-build-image:
     uses: ./.github/workflows/build_image_sh.yaml
     with:
-      platform: ${{ inputs.platform }}
       locations: ${{ inputs.locations }}
-      pytest_options: ${{ inputs.pytest_options }}
+      platform: ${{ inputs.platform }}
 
-  load-image:
+  download-image:
     needs: trigger-build-image
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
       image_id: ${{ steps.load-image.outputs.image_id }}
     steps:
+      - name: Checkout the repo
+        id: checkout-repo
+        uses: actions/checkout@v3
+
       - name: Download Docker image artifact
         id: get-artifact
         uses: actions/download-artifact@v4
@@ -66,15 +73,16 @@ jobs:
       - name: Load Docker image
         id: load-image
         run: |
-          image_id=$(gzip -dc docker-image/*.tar.gz | docker load | cut -d ' ' -f 3)
-          echo "::set-output name=image_id::$image_id"
+          IMAGE=$(gzip -dc docker-image/*.tar.gz | docker load | cut -d ' ' -f 3)
+          echo "Loaded Image: $IMAGE"
+          echo "image_id=$IMAGE" >> $GITHUB_OUTPUT
       
   # Print out some stuff about the test environment
   image-sanity-checks:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
-    needs: load-image
+    needs: download-image
     env: 
-      image_id: ${{ needs.load-image.outputs.image_id }}
+      image_id: ${{ needs.download-image.outputs.image_id }}
     steps:
       - name: CUDA/ROCm info
         if: ${{ env.with_gpu == 'true' }}
@@ -90,7 +98,7 @@ jobs:
   # Run the tests for each repo in parallel in a test container
   run-tests:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
-    needs: [load-image, image-sanity-checks]
+    needs: [download-image, image-sanity-checks]
     timeout-minutes: 540
     strategy:
       fail-fast: false
@@ -99,7 +107,7 @@ jobs:
     steps:
     - name: Run pytest
       env:
-        image_id: ${{ needs.load-image.outputs.image_id }}
+        image_id: ${{ needs.download-image.outputs.image_id }}
         test_contexts: ${{ inputs.test_contexts }}
         pytest_options: ${{ inputs.pytest_options }}
       run: |
@@ -113,7 +121,7 @@ jobs:
 
   wait:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
-    needs: [load-image, run-tests]
+    needs: [download-image, run-tests]
     if: success() || failure()
     steps:
       - name: Wait
@@ -123,9 +131,9 @@ jobs:
   # no unused images and stopped containers
   teardown:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
-    needs: [load-image, wait]
+    needs: [download-image, wait]
     env: 
-      image_id: ${{ needs.load-image.outputs.image_id }}
+      image_id: ${{ needs.download-image.outputs.image_id }}
     if: always()
     steps:
       - name: Stop the containers and remove the image

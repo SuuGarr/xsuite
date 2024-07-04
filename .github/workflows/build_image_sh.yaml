@@ -18,26 +18,16 @@ on:
         "xcoll_location":"xsuite:main"}'
         required: false
         type: string
-      pytest_options:
-        description: Command to run tests
-        required: true
-        type: string
-      test_contexts:
-        required: false
-        type: string
-        default: 'ContextCpu;ContextCpu:auto;ContextCupy;ContextPyopencl'
       platform:
         required: true
         type: string
-      suites:
-        description: a list of the suites to run as a JSON string
-        required: false
-        type: string
-        default: '["xobjects", "xdeps", "xpart", "xtrack", "xfields", "xcoll"]'
 
 env:
   with_gpu: ${{ contains(inputs.test_contexts, 'Cupy') || contains(inputs.test_contexts, 'Pyopencl') }}
 
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+# The jobs are all run in independent environments. Here we will run a separate job
+# The jobs upload image to GitHub Artifact 
 jobs:
   build-and-upload:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
@@ -88,6 +78,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with: 
           name: docker-image
-          path: "./${{ env.image_id }}.tar.gz"
+          path: ./${{ env.image_id }}.tar.gz
           if-no-files-found: error
           retention-days: 1
