@@ -22,6 +22,7 @@ on:
         description: Command to run tests
         required: false
         type: string
+        default: ''
       test_contexts:
         required: false
         type: string
@@ -50,7 +51,6 @@ jobs:
     uses: ./.github/workflows/build_image_sh.yaml
     with:
       locations: ${{ inputs.locations }}
-      pytest_options: ${{ inputs.pytest_options }}
       platform: ${{ inputs.platform }}
 
 
