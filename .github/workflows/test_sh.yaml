@@ -53,7 +53,6 @@ jobs:
       locations: ${{ inputs.locations }}
       platform: ${{ inputs.platform }}
 
-
   download-image:
     needs: trigger-build-image
     runs-on: [self-hosted, "${{ inputs.platform }}"]
