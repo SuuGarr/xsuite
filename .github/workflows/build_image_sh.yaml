@@ -22,7 +22,6 @@ on:
         description: Command to run tests
         required: true
         type: string
-        default: ''
       platform:
         required: true
         type: string
