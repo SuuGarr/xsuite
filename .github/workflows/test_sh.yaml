@@ -42,7 +42,6 @@ env:
 # The jobs are all run in independent environments. Here we will run a separate job
 # for each of the test suites specified in the matrix below.
 jobs:
-
   trigger-build-image:
     uses: ./.github/workflows/build_image_sh.yaml
     with:
@@ -50,12 +49,16 @@ jobs:
       locations: ${{ inputs.locations }}
       pytest_options: ${{ inputs.pytest_options }}
 
-  load-image:
+  download-image:
     needs: trigger-build-image
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
       image_id: ${{ steps.load-image.outputs.image_id }}
     steps:
+      - name: Checkout the repo
+        id: checkout-repo
+        uses: actions/checkout@v3
+
       - name: Download Docker image artifact
         id: get-artifact
         uses: actions/download-artifact@v4
@@ -66,13 +69,14 @@ jobs:
       - name: Load Docker image
         id: load-image
         run: |
-          image_id=$(gzip -dc docker-image/*.tar.gz | docker load | cut -d ' ' -f 3)
-          echo "::set-output name=image_id::$image_id"
+          IMAGE=$(gzip -dc docker-image/*.tar.gz | docker load | cut -d ' ' -f 3)
+          docker tag $IMAGE docker-image:latest
+          echo "image_id=$IMAGE" >> $GITHUB_OUTPUT
       
   # Print out some stuff about the test environment
   image-sanity-checks:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
-    needs: load-image
+    needs: download-image
     env: 
       image_id: ${{ needs.load-image.outputs.image_id }}
     steps:
@@ -90,7 +94,7 @@ jobs:
   # Run the tests for each repo in parallel in a test container
   run-tests:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
-    needs: [load-image, image-sanity-checks]
+    needs: [download-image, image-sanity-checks]
     timeout-minutes: 540
     strategy:
       fail-fast: false
@@ -113,7 +117,7 @@ jobs:
 
   wait:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
-    needs: [load-image, run-tests]
+    needs: [download-image, run-tests]
     if: success() || failure()
     steps:
       - name: Wait
@@ -123,7 +127,7 @@ jobs:
   # no unused images and stopped containers
   teardown:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
-    needs: [load-image, wait]
+    needs: [download-image, wait]
     env: 
       image_id: ${{ needs.load-image.outputs.image_id }}
     if: always()
