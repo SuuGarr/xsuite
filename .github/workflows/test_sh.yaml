@@ -50,21 +50,23 @@ jobs:
   check-image-exists:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
-      image_id: ${{ steps.check-image.outputs.image_id }}
+      image_exists: ${{ steps.check-image.outputs.image_exists }}
     steps:
       - name: Check Docker image exists
         id: check-image
         run: |
           IMAGE_TAG="docker-image:latest"
           if docker images -q $IMAGE_TAG; then
-            echo "image_id=true" >> $GITHUB_OUTPUT
+            echo "image_exists=true" >> $GITHUB_OUTPUT
           else
-            echo "image_id=false" >> $GITHUB_OUTPUT
+            echo "image_exists=false" >> $GITHUB_OUTPUT
           fi
-       
+      - name: Debug Image Exists Output
+        run: echo "Image exists: ${{ steps.check-image.outputs.image_exists }}"
+     
   trigger-build-image:
     needs: check-image-exists 
-    if: needs.check-image-exists.outputs.image_id == 'false'
+    if: needs.check-image-exists.outputs.image_exists == 'false'
     uses: ./.github/workflows/build_image_sh.yaml
     with:
       locations: ${{ inputs.locations }}
@@ -72,7 +74,7 @@ jobs:
 
   download-image:
     needs: [check-image-exists, trigger-build-image]
-    if: needs.check-image-exists.outputs.image_id == 'true' || always()
+    if: needs.check-image-exists.outputs.image_exists == 'true' || always()
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
       image_id: ${{ steps.load-image.outputs.image_id }}
@@ -94,7 +96,7 @@ jobs:
           IMAGE=$(gzip -dc docker-image/*.tar.gz | docker load | cut -d ' ' -f 3)
           echo "Loaded Image: $IMAGE"
           echo "image_id=$IMAGE" >> $GITHUB_OUTPUT
-      
+
   # Print out some stuff about the test environment
   image-sanity-checks:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
