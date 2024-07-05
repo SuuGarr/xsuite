@@ -57,16 +57,28 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+            const runs = await github.rest.actions.listWorkflowRuns({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              run_id: context.runId
+              status: 'completed',
+              per_page: 5 // Adjust per_page to your needs
             });
-            console.log("Artifacts found: ", artifacts.data.artifacts.map(a => a.name));
-            const artifactExists = artifacts.data.artifacts.some(artifact => artifact.name === 'docker-image');
-            console.log("Artifact 'docker-image' exists: ", artifactExists);
+            let artifactExists = false;
+            for (const run of runs.data.workflow_runs) {
+              const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                run_id: run.id
+              });
+              console.log(`Run ${run.id} artifacts: `, artifacts.data.artifacts.map(a => a.name));
+              if (artifacts.data.artifacts.some(artifact => artifact.name === 'docker-image')) {
+                artifactExists = true;
+                break;
+              }
+            }
+            console.log("Artifact 'docker-image' exists in recent runs: ", artifactExists);
             core.setOutput('artifact-exists', artifactExists.toString());
-
+            
   trigger-build-image:
     needs: check-image-artifact
     if: needs.check-image-artifact.outputs.artifact_exists == 'false'
