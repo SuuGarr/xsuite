@@ -63,9 +63,11 @@ jobs:
       - name: Check artifact was downloaded
         id: artifact-exist-check
         run: |
-          if [ -f "docker-image/*.tar.gz" ]; then
+          if [ -d "/tmp/docker-image" ] && [ "$(ls -A /tmp/docker-image)" ]; then
+            echo "Download succeeded, artifact exists."
             echo "artifact-exists=true" >> $GITHUB_OUTPUT
           else
+            echo "Download failed or artifact is empty."
             echo "artifact-exists=false" >> $GITHUB_OUTPUT
           fi
 
