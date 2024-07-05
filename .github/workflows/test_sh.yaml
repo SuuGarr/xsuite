@@ -56,8 +56,8 @@ jobs:
       - name: Check docker image exists
         id: check-image 
         run: |
-          IMGAE = "docker-image:latest"
-          if docker pull $IMAGE; then
+          image = "docker-image:latest"
+          if docker pull $image; then
             echo "image_exists=true" >> $GITHUB_OUTPUT
           else
             echo "image_exidsts=false" >> $GITHUB_OUTPUT
