@@ -60,7 +60,7 @@ jobs:
           path: docker-image
         continue-on-error: true
 
-      - name: Check if artifact was downloaded
+      - name: Check artifact was downloaded
         id: artifact-exist-check
         run: |
           if [ -f "docker-image/*.tar.gz" ]; then
@@ -79,7 +79,6 @@ jobs:
 
   download-image:
     needs: [check-image-artifact, trigger-build-image]
-    if: needs.check-image-artifact.outputs.artifact_exists == 'true' 
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
       image_id: ${{ steps.load-image.outputs.image_id }}
