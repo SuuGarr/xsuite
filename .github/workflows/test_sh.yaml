@@ -47,14 +47,31 @@ env:
 # The Job Trigger and Download image from GitHub Artifact 
 # branches as inputs
 jobs:
+
+  check-image-exists:
+    runs-on: [self-hosted, "${{ inputs.platform }}"]
+    outputs:
+      image_id: ${{ steps.check-image.ouputs.image_id }}
+    steps:
+      - name: Check docker image exists
+        id: check-image 
+        run: |
+          IMGAE = "docker-image:latest"
+          if docker pull $IMAGE; then
+            echo "image_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "image_exidsts=false" >> $GITHUB_OUTPUT
+          fi
+       
   trigger-build-image:
+    if: needs.check-image-exists.outputs.image_id == 'false'
     uses: ./.github/workflows/build_image_sh.yaml
     with:
       locations: ${{ inputs.locations }}
       platform: ${{ inputs.platform }}
 
   download-image:
-    needs: trigger-build-image
+    needs: [trigger-build-image, check-image-exists]
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
       image_id: ${{ steps.load-image.outputs.image_id }}

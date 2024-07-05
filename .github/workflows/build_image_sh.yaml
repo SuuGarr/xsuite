@@ -65,7 +65,7 @@ jobs:
             --build-arg with_gpu=${with_gpu} \
             -t $IMAGE .
           docker save $IMAGE | gzip > $IMAGE.tar.gz
-          ls -la
+          echo "image_id=$IMAGE" >> $GITHUB_OUTPUT
 
       - id: debug-info
         name: Debug Info
