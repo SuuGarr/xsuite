@@ -70,8 +70,8 @@ jobs:
       locations: ${{ inputs.locations }}
       platform: ${{ inputs.platform }}
 
- 
-    needs: [trigger-build-image, check-image-exists]
+  download-image:
+    needs: trigger-build-image
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
       image_id: ${{ steps.load-image.outputs.image_id }}
