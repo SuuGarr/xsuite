@@ -47,27 +47,28 @@ env:
 # The Job Trigger and Download image from GitHub Artifact 
 # branches as inputs
 jobs:
-  check-image-exists:
+  check-image-artifact:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
-      image_exists: ${{ steps.check-image.outputs.image_exists }}
+      artifact_exists: ${{ steps.check-artigact.outputs.artifact_exists }}
     steps:
-      - name: Check Docker image exists
-        id: check-image
+      - name: Check artifact Exists
+        id: check-artigact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+          path: /tmp/docker-image 
+        continue-on-error: true
         run: |
-          IMAGE_TAG="docker-image:latest"
-          if docker images -q $IMAGE_TAG; then
-            echo "image_exists=true" >> $GITHUB_OUTPUT
+          if [-f "/tmp/docker-image/*.tar.gz"]; then
+            echo "::set-output name=artifact-exists::true"
           else
-            echo "image_exists=false" >> $GITHUB_OUTPUT
+            echo "::set-output name=artifact-exists::false"
           fi
 
-      - name: Check Image Exists
-        run: echo "image exists ${{ steps.check-image.outputs.image_exists }}"
-
   trigger-build-image:
-    needs: check-image-exists 
-    if: needs.check-image-exists.outputs.image_exists == 'false'
+    needs: check-image-artifact
+    if: needs.check-artigact.outputs.artifact_exists == 'false'
     uses: ./.github/workflows/build_image_sh.yaml
     with:
       locations: ${{ inputs.locations }}
@@ -75,7 +76,7 @@ jobs:
 
   download-image:
     needs: [check-image-exists, trigger-build-image]
-    if: needs.check-image-exists.outputs.image_exists == 'true' || always()
+    if: needs.check-artigact.outputs.artifact_exists == 'true' 
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
       image_id: ${{ steps.load-image.outputs.image_id }}
