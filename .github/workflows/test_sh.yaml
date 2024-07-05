@@ -50,7 +50,7 @@ jobs:
   check-image-artifact:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
-      artifact_exists: ${{ steps.check-artifact.outputs.artifact-exists }}
+      artifact_exists: ${{ steps.check-artifact.outputs.artifact_exists }}
     steps:
       - id: check-artifact
         name: Check for existing Docker image artifact
@@ -70,7 +70,7 @@ jobs:
 
   trigger-build-image:
     needs: check-image-artifact
-    if: ${{ needs.check-image-artifact.outputs.artifact-exists == 'false' }}
+    if: ${{ needs.check-image-artifact.outputs.artifact_exists  == 'false' }}
     uses: ./.github/workflows/build_image_sh.yaml
     with:
       locations: ${{ inputs.locations }}
@@ -78,7 +78,7 @@ jobs:
 
   download-image:
     needs: [check-image-artifact, trigger-build-image]
-    if: ${{ needs.check-image-artifact.outputs.artifact-exists == 'true' || needs.trigger-build-image.result == 'success' }}
+    if: ${{ needs.check-image-artifact.outputs.artifact_exists == 'true' || needs.trigger-build-image.result == 'success' }}
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
       image_id: ${{ steps.load-image.outputs.image_id }}
