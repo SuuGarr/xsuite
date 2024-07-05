@@ -62,6 +62,9 @@ jobs:
             echo "image_exists=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Check Image Exists
+        run: echo "image exists ${{ steps.check-image.outputs.image_exists }}"
+
   trigger-build-image:
     needs: check-image-exists 
     if: needs.check-image-exists.outputs.image_exists == 'false'
