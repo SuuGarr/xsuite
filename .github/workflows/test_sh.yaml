@@ -61,10 +61,6 @@ jobs:
           else
             echo "image_id=false" >> $GITHUB_OUTPUT
           fi
-
-      - name: Debug Image Exists Output
-        run: echo "Image exists: ${{ steps.check-image.outputs.image_id }}"
-
        
   trigger-build-image:
     needs: check-image-exists 
