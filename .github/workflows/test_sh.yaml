@@ -67,10 +67,10 @@ jobs:
             } else {
               core.setOutput('artifact-found', 'false');
             }
-            
+
   trigger-build-image:
     needs: check-image-artifact
-    if: needs.check-image-artifact.outputs.artifact_exists == 'false'
+    if: needs.check-artifact.outputs.artifact-exists == 'false'
     uses: ./.github/workflows/build_image_sh.yaml
     with:
       locations: ${{ inputs.locations }}
