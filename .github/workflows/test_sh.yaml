@@ -57,9 +57,9 @@ jobs:
         run: |
           IMAGE_TAG="docker-image:latest"
           if docker images -q $IMAGE_TAG; then
-            echo "image_exists=true" >> $GITHUB_OUTPUT
+            echo "image_id=true" >> $GITHUB_OUTPUT
           else
-            echo "image_exists=false" >> $GITHUB_OUTPUT
+            echo "image_id=false" >> $GITHUB_OUTPUT
           fi
        
   trigger-build-image:
