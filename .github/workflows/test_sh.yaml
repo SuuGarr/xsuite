@@ -61,6 +61,10 @@ jobs:
           else
             echo "image_id=false" >> $GITHUB_OUTPUT
           fi
+
+      - name: Debug Image Exists Output
+        run: echo "Image exists: ${{ steps.check-image.outputs.image_id }}"
+
        
   trigger-build-image:
     needs: check-image-exists 
@@ -71,7 +75,8 @@ jobs:
       platform: ${{ inputs.platform }}
 
   download-image:
-    needs: trigger-build-image
+    needs: [trigger-build-image, check-image-exists]
+    if: needs.check-image-exists.outputs.image_exists == 'true' || always()
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
       image_id: ${{ steps.load-image.outputs.image_id }}
