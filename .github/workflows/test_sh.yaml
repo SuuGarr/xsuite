@@ -56,14 +56,11 @@ jobs:
         id: check-image
         run: |
           IMAGE_TAG="docker-image:latest"
-          if docker pull $IMAGE_TAG; then
+          if docker images -q $IMAGE_TAG; then
             echo "image_exists=true" >> $GITHUB_OUTPUT
           else
             echo "image_exists=false" >> $GITHUB_OUTPUT
           fi
-        - name: Debug Image Exists
-          run: echo "Image exists: ${{ steps.check-image.outputs.image_id }}"
-
        
   trigger-build-image:
     if: needs.check-image-exists.outputs.image_id == 'false'
