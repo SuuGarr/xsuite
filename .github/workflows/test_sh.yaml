@@ -77,7 +77,7 @@ jobs:
       platform: ${{ inputs.platform }}
 
   download-image:
-    needs: [check-image-exists, trigger-build-image]
+    needs: [check-image-artifact, trigger-build-image]
     if: needs.check-artigact.outputs.artifact_exists == 'true' 
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
