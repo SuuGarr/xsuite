@@ -62,9 +62,11 @@ jobs:
               repo: context.repo.repo,
               run_id: context.runId
             });
+            console.log("Artifacts found: ", artifacts.data.artifacts.map(a => a.name));
             const artifactExists = artifacts.data.artifacts.some(artifact => artifact.name === 'docker-image');
+            console.log("Artifact 'docker-image' exists: ", artifactExists);
             core.setOutput('artifact-exists', artifactExists.toString());
-            
+
   trigger-build-image:
     needs: check-image-artifact
     if: needs.check-image-artifact.outputs.artifact_exists == 'false'
