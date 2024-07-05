@@ -50,27 +50,21 @@ jobs:
   check-image-artifact:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
-      artifact_exists: ${{ steps.artifact-exist-check.outputs.artifact-exists }}
+      artifact_exists: ${{ steps.check-artifact.outputs.artifact-exists }}
     steps:
-      - name: Attempt to download Docker image artifact
-        id: download-artifact
-        uses: actions/download-artifact@v4
+      - id: check-artifact
+        name: Check for existing Docker image artifact
+        uses: actions/github-script@v6
         with:
-          name: docker-image
-          path: docker-image
-        continue-on-error: true
-
-      - name: Check artifact was downloaded
-        id: artifact-exist-check
-        run: |
-          if [ -d "/tmp/docker-image" ] && [ "$(ls -A /tmp/docker-image)" ]; then
-            echo "Download succeeded, artifact exists."
-            echo "artifact-exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "Download failed or artifact is empty."
-            echo "artifact-exists=false" >> $GITHUB_OUTPUT
-          fi
-
+          script: |
+            const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: context.runId
+            });
+            const artifactExists = artifacts.data.artifacts.some(artifact => artifact.name === 'docker-image');
+            core.setOutput('artifact-exists', artifactExists.toString());
+            
   trigger-build-image:
     needs: check-image-artifact
     if: needs.check-image-artifact.outputs.artifact_exists == 'false'
