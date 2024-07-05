@@ -53,19 +53,20 @@ jobs:
       artifact_exists: ${{ steps.artifact-exist-check.outputs.artifact-exists }}
     steps:
       - name: Attempt to download Docker image artifact
+        id: download-artifact
         uses: actions/download-artifact@v4
         with:
           name: docker-image
-          path: /tmp/docker-image
+          path: docker-image
         continue-on-error: true
 
       - name: Check if artifact was downloaded
         id: artifact-exist-check
         run: |
-          if [ -f "/tmp/docker-image/*.tar.gz" ]; then
-            echo "::set-output name=artifact-exists::true"
+          if [ -f "docker-image/*.tar.gz" ]; then
+            echo "artifact-exists=true" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=artifact-exists::false"
+            echo "artifact-exists=false" >> $GITHUB_OUTPUT
           fi
 
   trigger-build-image:
