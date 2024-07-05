@@ -63,13 +63,13 @@ jobs:
           fi
        
   trigger-build-image:
-    if: needs.check-image-exists.outputs.image_id == 'false'
+    if: needs.check-image-exists.outputs.image_id == 'true' || success()
     uses: ./.github/workflows/build_image_sh.yaml
     with:
       locations: ${{ inputs.locations }}
       platform: ${{ inputs.platform }}
 
-  download-image:
+ 
     needs: [trigger-build-image, check-image-exists]
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
