@@ -47,20 +47,19 @@ env:
 # The Job Trigger and Download image from GitHub Artifact 
 # branches as inputs
 jobs:
-
   check-image-exists:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
-      image_id: ${{ steps.check-image.ouputs.image_id }}
+      image_id: ${{ steps.check-image.outputs.image_id }}
     steps:
-      - name: Check docker image exists
-        id: check-image 
+      - name: Check Docker image exists
+        id: check-image
         run: |
-          image = "docker-image:latest"
-          if docker pull $image; then
+          IMAGE_TAG="docker-image:latest"
+          if docker pull $IMAGE_TAG; then
             echo "image_exists=true" >> $GITHUB_OUTPUT
           else
-            echo "image_exidsts=false" >> $GITHUB_OUTPUT
+            echo "image_exists=false" >> $GITHUB_OUTPUT
           fi
        
   trigger-build-image:
