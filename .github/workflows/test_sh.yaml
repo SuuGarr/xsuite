@@ -71,7 +71,7 @@ jobs:
 
   trigger-build-image:
     needs: check-image-artifact
-    if: needs.check-artigact.outputs.artifact_exists == 'false'
+    if: needs.artifact-exist-check.outputs.artifact-exists == 'false'
     uses: ./.github/workflows/build_image_sh.yaml
     with:
       locations: ${{ inputs.locations }}
@@ -79,7 +79,7 @@ jobs:
 
   download-image:
     needs: [check-image-artifact, trigger-build-image]
-    if: needs.check-artigact.outputs.artifact_exists == 'true' 
+    if: needs.artifact-exist-check.outputs.artifact-exists == 'true' 
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
       image_id: ${{ steps.load-image.outputs.image_id }}
