@@ -50,17 +50,19 @@ jobs:
   check-image-artifact:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
-      artifact_exists: ${{ steps.check-artigact.outputs.artifact_exists }}
+      artifact_exists: ${{ steps.artifact-exist-check.outputs.artifact-exists }}
     steps:
-      - name: Check artifact Exists
-        id: check-artigact
+      - name: Attempt to download Docker image artifact
         uses: actions/download-artifact@v4
         with:
           name: docker-image
-          path: /tmp/docker-image 
+          path: /tmp/docker-image
         continue-on-error: true
+
+      - name: Check if artifact was downloaded
+        id: artifact-exist-check
         run: |
-          if [-f "/tmp/docker-image/*.tar.gz"]; then
+          if [ -f "/tmp/docker-image/*.tar.gz" ]; then
             echo "::set-output name=artifact-exists::true"
           else
             echo "::set-output name=artifact-exists::false"
