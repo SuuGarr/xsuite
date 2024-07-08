@@ -50,7 +50,7 @@ jobs:
   check-image-artifact:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
-      artifact_exists: ${{ steps.check-artifact.outputs.artifact-found }}
+      artifact_exists: ${{ steps.check-artifact.outputs.artifact_exists }}
     steps:
       - id: check-artifact
         name: Check for existing Docker image artifact
@@ -65,10 +65,10 @@ jobs:
             const artifact = artifacts.data.artifacts.find(artifact => artifact.name === 'docker-image');
             if (artifact) {
               console.log("Artifact 'docker-image' found");
-              core.setOutput('artifact-found', 'true');
+              core.setOutput('artifact_exists', 'true');
             } else {
               console.log("Artifact 'docker-image' not found");
-              core.setOutput('artifact-found', 'false');
+              core.setOutput('artifact_exists', 'false');
             }
 
   trigger-build-image:
@@ -81,7 +81,7 @@ jobs:
 
   download-image:
     needs: [check-image-artifact, trigger-build-image]
-    if: ${{ needs.check-image-artifact.outputs.artifact_exists == 'true' }} 
+    if: ${{ needs.check-image-artifact.outputs.artifact_exists == 'true' || needs.trigger-build-image.result == 'success' }}
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
       image_id: ${{ steps.load-image.outputs.image_id }}
