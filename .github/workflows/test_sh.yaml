@@ -50,7 +50,7 @@ jobs:
   check-image-artifact:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
-      artifact_exists: ${{ steps.check-artifact.outputs.artifact_exists }}
+      artifact_exists: ${{ steps.check-artifact.outputs.artifact-found }}
     steps:
       - id: check-artifact
         name: Check for existing Docker image artifact
