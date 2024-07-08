@@ -81,7 +81,6 @@ jobs:
 
   download-image:
     needs: [check-image-artifact, trigger-build-image]
-    if: ${{ needs.check-image-artifact.outputs.artifact_exists == 'true' || needs.trigger-build-image.result == 'success' }}
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
       image_id: ${{ steps.load-image.outputs.image_id }}
