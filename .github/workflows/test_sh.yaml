@@ -61,10 +61,13 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
+            console.log("Artifacts found:", artifacts.data.artifacts.map(a => a.name));
             const artifact = artifacts.data.artifacts.find(artifact => artifact.name === 'docker-image');
             if (artifact) {
+              console.log("Artifact 'docker-image' found");
               core.setOutput('artifact-found', 'true');
             } else {
+              console.log("Artifact 'docker-image' not found");
               core.setOutput('artifact-found', 'false');
             }
 
