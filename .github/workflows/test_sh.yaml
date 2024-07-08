@@ -78,9 +78,6 @@ jobs:
     with:
       locations: ${{ inputs.locations }}
       platform: ${{ inputs.platform }}
-    steps:
-      - name: Debug Artifact Check
-        run: echo "artifact_exists: ${{ needs.check-image-artifact.outputs.artifact_exists }}"
 
   download-image:
     needs: [check-image-artifact, trigger-build-image]
