@@ -141,5 +141,5 @@ jobs:
           docker container stop \
             $(docker ps -q --filter ancestor=${image_id}) || true
           docker container rm --volumes \
-            $(docker ps -qa --filter ancestor=${image_id}}) || true
+            $(docker ps -qa --filter ancestor=${image_id}) || true
           docker image rm ${image_id}
