@@ -61,19 +61,16 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
-            console.log("Artifacts found:", artifacts.data.artifacts.map(a => a.name));
             const artifact = artifacts.data.artifacts.find(artifact => artifact.name === 'docker-image');
             if (artifact) {
-              console.log("Artifact 'docker-image' found");
               core.setOutput('artifact_exists', 'true');
             } else {
-              console.log("Artifact 'docker-image' not found");
               core.setOutput('artifact_exists', 'false');
             }
             
   trigger-build-image:
     needs: check-image-artifact
-    if: needs.check-image-artifact.outputs.artifact_exists == 'flase'
+    if: needs.check-image-artifact.outputs.artifact_exists == 'false'
     uses: ./.github/workflows/build_image_sh.yaml
     with:
       locations: ${{ inputs.locations }}
