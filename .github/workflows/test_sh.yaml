@@ -47,13 +47,38 @@ env:
 # The Job Trigger and Download image from GitHub Artifact 
 # branches as inputs
 jobs:
+  check-image-artifact:
+    runs-on: [self-hosted, "${{ inputs.platform }}"]
+    outputs:
+      artifact_exists: ${{ steps.check-artifact.outputs.artifact_exists}}
+    steps:
+      - id: check-artifact
+        name: Check existing docker image Artifact
+        uses: actions/github-script@v6
+        with: 
+          script: |
+            const artifact = await github.rest.actions.listArtifactsForRepo ({
+              owner: context.repo.owner,
+              repo: cintext.repo.repo,
+              });
+              const artifact = artifact.data.artifacts.find(artifact => artifact.name === 'docker-image');
+              if (artifact){
+                core.setOutput('artifact_exists', 'true');
+              } else {
+                core.setOutput('artifact_exists', 'flase');
+                
+              }
+
   trigger-build-image:
+    needs: check-image-artifact
     uses: ./.github/workflows/build_image_sh.yaml
+    if: needs.check-image-artifact.outputs.artifact_exists == 'flase'
     with:
       locations: ${{ inputs.locations }}
 
   download-image:
-    needs: trigger-build-image
+    needs: [trigger-build-image, check-image-artifact]
+    if: needs.check-image-artifact.outputs.artifact_exists == 'true'
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
       image_id: ${{ steps.load-image.outputs.image_id }}
