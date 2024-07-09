@@ -73,8 +73,8 @@ jobs:
             
   trigger-build-image:
     needs: check-image-artifact
-    uses: ./.github/workflows/build_image_sh.yaml
     if: needs.check-image-artifact.outputs.artifact_exists == 'flase'
+    uses: ./.github/workflows/build_image_sh.yaml
     with:
       locations: ${{ inputs.locations }}
 
