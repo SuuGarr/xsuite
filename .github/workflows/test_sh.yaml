@@ -52,19 +52,22 @@ jobs:
     outputs:
       artifact_exists: ${{ steps.check-artifact.outputs.artifact_exists }}
     steps:
-      - name: Check existing docker image Artifact
-        id: check-artifact
+      - id: check-artifact
+        name: Check for existing Docker image artifact
         uses: actions/github-script@v6
         with:
           script: |
-            const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+            const artifacts = await github.rest.actions.listArtifactsForRepo({
               owner: context.repo.owner,
-              repo: context.repo.repo
+              repo: context.repo.repo,
             });
+            console.log("Artifacts found:", artifacts.data.artifacts.map(a => a.name));
             const artifact = artifacts.data.artifacts.find(artifact => artifact.name === 'docker-image');
             if (artifact) {
+              console.log("Artifact 'docker-image' found");
               core.setOutput('artifact_exists', 'true');
             } else {
+              console.log("Artifact 'docker-image' not found");
               core.setOutput('artifact_exists', 'false');
             }
             
