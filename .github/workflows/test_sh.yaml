@@ -61,13 +61,17 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
-            const artifact = artifacts.data.artifacts.find(artifact => artifact.name === 'docker-image');
+            const artifact = artifacts.data.artifacts.find(a => a.name === 'docker-image');
             if (artifact) {
               core.setOutput('artifact_exists', 'true');
+              console.log("Artifact 'docker-image' found");
             } else {
               core.setOutput('artifact_exists', 'false');
+              console.log("Artifact 'docker-image' not found");
             }
-            
+      - name: Check artifact exists output
+        run: echo "Artifact exists: ${{ steps.check-artifact.outputs.artifact_exists }}"
+
   trigger-build-image:
     needs: check-image-artifact
     if: needs.check-image-artifact.outputs.artifact_exists == 'false'
