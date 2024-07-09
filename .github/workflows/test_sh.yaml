@@ -61,7 +61,7 @@ jobs:
               owner: context.repo.owner,
               repo: cintext.repo.repo,
               });
-              const artifact = artifact.data.artifacts.find(artifact => artifact.name === 'docker-image');
+              const artifact = artifacts.data.artifacts.find(artifact => artifact.name === 'docker-image');
               if (artifact){
                 core.setOutput('artifact_exists', 'true');
               } else {
