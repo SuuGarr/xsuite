@@ -59,7 +59,7 @@ jobs:
           script: |
             const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
               owner: context.repo.owner,
-              repo: context.repo.repo,
+              repo: context.repo.repo
             });
             const artifact = artifacts.data.artifacts.find(artifact => artifact.name === 'docker-image');
             if (artifact) {
