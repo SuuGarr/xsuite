@@ -39,6 +39,8 @@ on:
         type: string
         default: '["xobjects", "xdeps", "xpart", "xtrack", "xfields", "xmask", "xcoll"]'
 
+  schedule:
+     - cron: "00 19 * * *"
 # This workflow calls the test_sh.yaml workflow passing the specified
 # branches as inputs
 jobs:
