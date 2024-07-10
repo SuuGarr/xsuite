@@ -105,8 +105,8 @@ jobs:
         if: success()
         uses: actions/download-artifact@v4
         with:
-          name: docker-image.zip
-          path: docker-image
+          name: docker-image
+          path: ./${{ env.image_id }}.tar.gz
 
       - name: Load Docker image
         id: load-image
