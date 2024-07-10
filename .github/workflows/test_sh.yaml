@@ -30,6 +30,10 @@ on:
       platform:
         required: true
         type: string
+      run_id:
+        description: 'Run ID for download artifacts'
+        required: false
+        type: string
       suites:
         description: a list of the suites to run as a JSON string
         required: false
@@ -51,6 +55,7 @@ jobs:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
       artifact_exists: ${{ steps.check-artifact.outputs.artifact_exists }}
+      artifact_run_id: ${{ steps.check-artifact.outputs.artifact_run_id }}
     steps:
       - id: check-artifact
         name: Check for existing Docker image artifact
@@ -63,11 +68,12 @@ jobs:
             });
             const artifact = artifacts.data.artifacts.find(a => a.name === 'docker-image');
             console.log('Artifact found:', artifact);
-            dockerImages.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-            const latestArtifact = dockerImages[0]; 
-            console.log('Most recent artifact:', latestArtifact);
-            core.setOutput('artifact_exists', artifact ? 'true' : 'false');
-            core.setOutput('artifact_url', latestArtifact ? latestArtifact.url : '');
+            if (artifact) {
+              core.setOutput('artifact_exists', 'true');
+              core.setOutput('artifact_run_id', artifact.workflow_run.id);
+            } else {
+              core.setOutput('artifact_exists', 'false');
+            }
 
   debug-output:
     needs: check-image-artifact
@@ -76,7 +82,7 @@ jobs:
       - name: Output artifact existence
         run: |
           echo "Artifact Exists: ${{ needs.check-image-artifact.outputs.artifact_exists }}"
-          echo "Artifact URL: ${{ needs.check-image-artifact.outputs.artifact_url }}"
+          echo "Artifact Run ID: ${{ needs.check-image-artifact.outputs.artifact_run_id }}"
 
   trigger-build-image:
     needs: check-image-artifact
@@ -91,11 +97,14 @@ jobs:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
       image_id: ${{ steps.load-image.outputs.image_id }}
+    permissions:
+      contents: read
+      actions: read
     steps:
       - name: Checkout the repo
         id: checkout-repo
         uses: actions/checkout@v3
-      
+
       - name: List available artifacts  
         uses: actions/github-script@v7
         with:
@@ -111,6 +120,7 @@ jobs:
         with:
           name: docker-image
           path: docker-image
+          run-id: ${{ needs.check-image-artifact.outputs.artifact_run_id }}
 
       - name: Load Docker image
         id: load-image
