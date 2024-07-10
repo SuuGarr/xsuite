@@ -52,7 +52,7 @@ jobs:
     outputs:
       artifact_exists: ${{ steps.check-artifact.outputs.artifact_exists }}
     steps:
-      - id: check-c
+      - id: check-artifact
         name: Check for existing Docker image artifact
         uses: actions/github-script@v7
         with:
