@@ -65,6 +65,13 @@ jobs:
             console.log('Artifact found:', artifact);
             core.setOutput('artifact_exists', artifact ? 'true' : 'false');
 
+  debug-output:
+    needs: check-image-artifact
+    runs-on: [self-hosted, "${{ inputs.platform }}"]
+    steps:
+      - name: Output artifact existence
+        run: echo "Artifact Exists: ${{ needs.check-image-artifact.outputs.artifact_exists }}"
+
   trigger-build-image:
     needs: check-image-artifact
     if: ${{ needs.check-image-artifact.outputs.artifact_exists == 'false' }}
