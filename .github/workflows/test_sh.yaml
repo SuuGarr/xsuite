@@ -69,10 +69,8 @@ jobs:
               core.setOutput('artifact_exists', 'false');
               console.log("Artifact 'docker-image' not found");
             }
-      - name: Check artifact exists output
         run: echo "Artifact exists: ${{ steps.check-artifact.outputs.artifact_exists }}"
 
-            
   trigger-build-image:
     needs: check-image-artifact
     if: needs.check-image-artifact.outputs.artifact_exists == 'false'
