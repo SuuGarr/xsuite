@@ -102,11 +102,10 @@ jobs:
             console.log(artifacts.data.artifacts);
 
       - name: Download Docker image artifact
-        if: success()
         uses: actions/download-artifact@v4
         with:
           name: docker-image
-          path: ./${{ env.image_id }}.tar.gz
+          path: docker-image
 
       - name: Load Docker image
         id: load-image
