@@ -72,7 +72,7 @@ jobs:
             if (artifact) {
               core.setOutput('artifact_exists', 'true');
               core.setOutput('artifact_run_id', artifact.workflow_run.id);
-              core.setOutput('artifact_nmae', artifact.name);
+              core.setOutput('artifact_name', artifact.name);
             } else {
               core.setOutput('artifact_exists', 'false');
             }
@@ -85,6 +85,7 @@ jobs:
         run: |
           echo "Artifact Exists: ${{ needs.check-image-artifact.outputs.artifact_exists }}"
           echo "Artifact Run ID: ${{ needs.check-image-artifact.outputs.artifact_run_id }}"
+          echo "Artifact Name: ${{ needs.check-image-artifact.outputs.artifact_name }}"
 
   trigger-build-image:
     needs: check-image-artifact
