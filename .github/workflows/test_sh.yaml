@@ -52,7 +52,7 @@ jobs:
     outputs:
       artifact_exists: ${{ steps.check-artifact.outputs.artifact_exists }}
     steps:
-      - id: check-artifact
+      - id: check-c
         name: Check for existing Docker image artifact
         uses: actions/github-script@v7
         with:
@@ -64,10 +64,10 @@ jobs:
             const artifact = artifacts.data.artifacts.find(a => a.name === 'docker-image');
             console.log(artifact)
             if (artifact) {
-              core.setBooleanOutput('artifact_exists', true);
+              core.setOutput('artifact_exists', String(true));
               console.log("Artifact 'docker-image' found");
             } else {
-              core.setBooleanOutput('artifact_exists', false);
+              core.setOutput('artifact_exists', String(false));
               console.log("Artifact 'docker-image' not found");
             }
 
