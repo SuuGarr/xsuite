@@ -118,8 +118,9 @@ jobs:
       - name: Download Docker image artifact
         uses: actions/download-artifact@v4
         with:
-          run-id: ${{ needs.check-image-artifact.outputs.artifact_run_id }}
           name: docker-image
+          repository: SuuGarr/xsuite
+          run-id: ${{ needs.check-image-artifact.outputs.artifact_run_id }}
 
       - name: Load Docker image
         id: load-image
