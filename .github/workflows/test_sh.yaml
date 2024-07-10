@@ -65,10 +65,8 @@ jobs:
             console.log(artifact)
             if (artifact) {
               core.setOutput('artifact_exists', 'true');
-              console.log("Artifact 'docker-image' found");
             } else {
               core.setOutput('artifact_exists', 'false');
-              console.log("Artifact 'docker-image' not found");
             }
 
   trigger-build-image:
