@@ -120,7 +120,7 @@ jobs:
       - name: Debug Artifact image name
         run: |
           echo "Using run-id: ${{ needs.check-image-artifact.outputs.artifact_run_id }}"
-          echo "Artifact name: docker-image"
+          echo "Artifact name: ${{ needs.check-image-artifact.outputs.artifact_name }}"
 
       - name: Download Docker image artifact
         uses: actions/download-artifact@v4
