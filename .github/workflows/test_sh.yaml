@@ -81,7 +81,7 @@ jobs:
       locations: ${{ inputs.locations }}
 
   download-image:
-    needs: [trigger-build-image, check-image-artifact]
+    needs: check-image-artifact
     if: ${{ needs.check-image-artifact.outputs.artifact_exists == 'true' }}
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
