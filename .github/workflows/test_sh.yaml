@@ -51,7 +51,6 @@ jobs:
     uses: ./.github/workflows/build_image_sh.yaml
     with:
       locations: ${{ inputs.locations }}
-      platform: ${{ inputs.platform }}
 
   download-image:
     needs: trigger-build-image
@@ -68,7 +67,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: docker-image
-          path: docker-image
+          path: docker-image.tar.gz
 
       - name: Load Docker image
         id: load-image
