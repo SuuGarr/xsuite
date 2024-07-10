@@ -118,9 +118,8 @@ jobs:
       - name: Download Docker image artifact
         uses: actions/download-artifact@v4
         with:
-          name: docker-image
-          path: docker-image
           run-id: ${{ needs.check-image-artifact.outputs.artifact_run_id }}
+          name: docker-image
 
       - name: Load Docker image
         id: load-image
