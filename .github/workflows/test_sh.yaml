@@ -64,10 +64,10 @@ jobs:
             const artifact = artifacts.data.artifacts.find(a => a.name === 'docker-image');
             console.log(artifact)
             if (artifact) {
-              core.setOutput('artifact_exists', String(true));
+              core.setOutput('artifact_exists', 'true');
               console.log("Artifact 'docker-image' found");
             } else {
-              core.setOutput('artifact_exists', String(false));
+              core.setOutput('artifact_exists', 'false');
               console.log("Artifact 'docker-image' not found");
             }
 
