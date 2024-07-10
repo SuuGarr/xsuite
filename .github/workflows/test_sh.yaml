@@ -63,7 +63,11 @@ jobs:
             });
             const artifact = artifacts.data.artifacts.find(a => a.name === 'docker-image');
             console.log('Artifact found:', artifact);
+            dockerImages.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            const latestArtifact = dockerImages[0]; 
+            console.log('Most recent artifact:', latestArtifact);
             core.setOutput('artifact_exists', artifact ? 'true' : 'false');
+            core.setOutput('artifact_url', latestArtifact ? latestArtifact.url : '');
 
   debug-output:
     needs: check-image-artifact
@@ -72,6 +76,7 @@ jobs:
       - name: Output artifact existence
         run: |
           echo "Artifact Exists: ${{ needs.check-image-artifact.outputs.artifact_exists }}"
+          echo "Artifact URL: ${{ needs.check-image-artifact.outputs.artifact_url }}"
 
   trigger-build-image:
     needs: check-image-artifact
