@@ -106,8 +106,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: docker-image
-          path: downloaded-image 
-          run-id: 1685732683
+          path: docker-image
+          run-id: ${{ github.event.inputs.run_id }} 
 
       - name: Load Docker image
         id: load-image
