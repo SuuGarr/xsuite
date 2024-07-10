@@ -56,6 +56,7 @@ jobs:
     outputs:
       artifact_exists: ${{ steps.check-artifact.outputs.artifact_exists }}
       artifact_run_id: ${{ steps.check-artifact.outputs.artifact_run_id }}
+      artifact_name: ${{ steps.check-artifact.outputs.artifact_name }}
     steps:
       - id: check-artifact
         name: Check for existing Docker image artifact
@@ -71,6 +72,7 @@ jobs:
             if (artifact) {
               core.setOutput('artifact_exists', 'true');
               core.setOutput('artifact_run_id', artifact.workflow_run.id);
+              core.setOutput('artifact_nmae', artifact.name);
             } else {
               core.setOutput('artifact_exists', 'false');
             }
@@ -123,7 +125,7 @@ jobs:
       - name: Download Docker image artifact
         uses: actions/download-artifact@v4
         with:
-          name: docker-image
+          name: ${{ needs.check-image-artifact.outputs.artifact_name }}
           repository: SuuGarr/xsuite
           run-id: ${{ needs.check-image-artifact.outputs.artifact_run_id }}
 
