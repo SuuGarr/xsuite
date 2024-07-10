@@ -48,13 +48,13 @@ env:
 # branches as inputs
 jobs:
   trigger-build-image:
-    needs: check-image-artifact
     uses: ./.github/workflows/build_image_sh.yaml
     with:
       locations: ${{ inputs.locations }}
+      platform: ${{ inputs.platform }}
 
   download-image:
-    needs: check-image-artifact
+    needs: trigger-build-image
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
       image_id: ${{ steps.load-image.outputs.image_id }}
@@ -68,7 +68,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: docker-image
-          path: docker-image.tar.gz
+          path: docker-image
 
       - name: Load Docker image
         id: load-image
@@ -141,5 +141,5 @@ jobs:
           docker container stop \
             $(docker ps -q --filter ancestor=${image_id}) || true
           docker container rm --volumes \
-            $(docker ps -qa --filter ancestor=${image_id}) || true
+            $(docker ps -qa --filter ancestor=${image_id}}) || true
           docker image rm ${image_id}
