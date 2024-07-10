@@ -70,7 +70,8 @@ jobs:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     steps:
       - name: Output artifact existence
-        run: echo "Artifact Exists: ${{ needs.check-image-artifact.outputs.artifact_exists }}"
+        run: |
+          echo "Artifact Exists: ${{ needs.check-image-artifact.outputs.artifact_exists }}"
 
   trigger-build-image:
     needs: check-image-artifact
