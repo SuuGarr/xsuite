@@ -99,7 +99,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
             });
-            return artifacts.data.artifacts.filter(artifact => artifact.name === 'docker-image' && !artifact.expired);
+            console.log(artifacts.data.artifacts);
 
       - name: Download Docker image artifact
         id: get-artifact
