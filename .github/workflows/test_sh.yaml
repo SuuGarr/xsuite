@@ -57,13 +57,20 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+            const artifacts = await github.rest.actions.listArtifactsForRepo({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              run_id: context.runId
             });
-            const artifactExists = artifacts.data.artifacts.some(artifact => artifact.name === 'docker-image');
-            core.setOutput('artifact_exists', artifactExists ? 'true' : 'false');
+            const artifact = artifacts.data.artifacts.find(a => a.name === 'docker-image');
+            if (artifact) {
+              core.setOutput('artifact_exists', 'true');
+              console.log("Artifact 'docker-image' found");
+            } else {
+              core.setOutput('artifact_exists', 'false');
+              console.log("Artifact 'docker-image' not found");
+            }
+        - run: |
+          echo "Artifact exists: ${{ steps.check-artifact.outputs.artifact_exists }}"
 
   trigger-build-image:
     needs: check-image-artifact
@@ -74,7 +81,7 @@ jobs:
 
   download-image:
     needs: [trigger-build-image, check-image-artifact]
-    if: needs.check-image-artifact.outputs.artifact_exists == 'true' || needs.trigger-build-image.outputs.build_completed == 'success'
+    if: needs.check-image-artifact.outputs.artifact_exists == 'true'
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
       image_id: ${{ steps.load-image.outputs.image_id }}
