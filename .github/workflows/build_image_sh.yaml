@@ -18,7 +18,6 @@ on:
         "xcoll_location":"xsuite:main"}'
         required: false
         type: string
-
 env:
   with_gpu: ${{ contains(inputs.test_contexts, 'Cupy') || contains(inputs.test_contexts, 'Pyopencl') }}
 
@@ -27,7 +26,7 @@ env:
 # The jobs upload image to GitHub Artifact 
 jobs:
   build-and-upload:
-    runs-on: [self-hosted, "${{ inputs.platform }}"]
+    runs-on: self-hosted
     outputs:
       image_id: ${{ steps.build-image.outputs.image_id }}
     steps:
