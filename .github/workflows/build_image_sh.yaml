@@ -18,9 +18,6 @@ on:
         "xcoll_location":"xsuite:main"}'
         required: false
         type: string
-      platform:
-        required: true
-        type: string
 
 env:
   with_gpu: ${{ contains(inputs.test_contexts, 'Cupy') || contains(inputs.test_contexts, 'Pyopencl') }}
