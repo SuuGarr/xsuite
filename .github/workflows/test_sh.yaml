@@ -102,7 +102,7 @@ jobs:
       image_id: ${{ steps.load-image.outputs.image_id }}
     permissions:
       contents: read
-      actions: read
+      actions: write
     steps:
       - name: Checkout the repo
         id: checkout-repo
