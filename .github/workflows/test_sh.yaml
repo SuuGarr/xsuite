@@ -47,7 +47,16 @@ env:
 # The Job Trigger and Download image from GitHub Artifact 
 # branches as inputs
 jobs:
+  trigger-build-image:
+    if: ${{ inputs.locations && input.locations != '' }}
+    uses: ./.github/workflows/build_image_sh.yaml
+    with:
+      locations: ${{ inputs.locations }}
+      # platform: ${{ inputs.platform }}
+      # test_contexts: ${{ inputs.test_contexts }}
+      # suites: ${{ inputs.suites }}
   download-image:
+    needs: trigger-build-image
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
       image_id: ${{ steps.load-image.outputs.image_id }}
