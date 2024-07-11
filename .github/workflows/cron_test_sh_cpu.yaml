@@ -4,14 +4,26 @@ name: Daily test (self-hosted, CPU)
 # Controls when the action will run.
 on:
   schedule:
-    - cron: '00 19 * * *'  # run at 19:00 UTC daily
+    - cron: '20 13 * * *'  # run at 19:00 UTC daily
 
 # This workflow calls the test_gpu.yaml workflow passing the default
 # branches as inputs. The cron workflow will not run on forks.
 jobs:
+  run-build-image:
+    name: build image
+    uses: ./.github/workflows/build_image_sh.yaml
+    with:
+      locations: '{ "xobjects_location":"xsuite:main" ,
+        "xdeps_location":"xsuite:main",
+        "xpart_location":"xsuite:main",
+        "xtrack_location":"xsuite:main",
+        "xfields_location":"xsuite:main",
+        "xmask_location":"xsuite:main",
+        "xcoll_location":"xsuite:main"}'
   run-tests-cron-sh-cpu-no-xmask-serial:
     if: github.repository == 'xsuite/xsuite'
     uses: ./.github/workflows/test_sh.yaml
+    needs: run-build-image
     with:
       test_contexts: 'ContextCpu'
       platform: 'alma-cpu-1'
@@ -19,6 +31,7 @@ jobs:
   run-tests-cron-sh-cpu-no-xmask-openmp:
     if: github.repository == 'xsuite/xsuite'
     uses: ./.github/workflows/test_sh.yaml
+    needs: run-build-image
     with:
       test_contexts: 'ContextCpu:auto'
       platform: 'alma-cpu-2'
@@ -26,6 +39,7 @@ jobs:
   run-tests-cron-sh-cpu-xmask:
     if: github.repository == 'xsuite/xsuite'
     uses: ./.github/workflows/test_sh.yaml
+    needs: run-build-image
     with:
       test_contexts: 'ContextCpu;ContextCpu:auto'
       platform: 'alma-cpu-smaller'
