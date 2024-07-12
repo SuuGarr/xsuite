@@ -56,7 +56,6 @@ jobs:
   download-image:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     if: ${{ github.event_name == 'schedule' || (github.event_name != 'schedule' && needs.trigger-build-image.result == 'success') }}
-    needs: ${{ github.event_name != 'schedule' && 'trigger-build-image' }}
     outputs:
       image_id: ${{ steps.load-image.outputs.image_id }}
     steps:
