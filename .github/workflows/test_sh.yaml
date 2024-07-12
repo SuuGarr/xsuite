@@ -48,7 +48,7 @@ env:
 # branches as inputs
 jobs:
   trigger-build-image:
-    if: ${{ inputs.locations && inputs.locations != '' && github.event_name != 'schedule' }}  
+    if: ${{ github.event_name != 'schedule' }}  
     uses: ./.github/workflows/build_image_sh.yaml
     with:
       locations: ${{ inputs.locations }}
