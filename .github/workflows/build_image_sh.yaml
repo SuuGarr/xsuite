@@ -18,19 +18,6 @@ on:
         "xcoll_location":"xsuite:main"}'
         required: false
         type: string
-      test_contexts:
-        required: false
-        type: string
-        default: 'ContextCpu;ContextCpu:auto;ContextCupy;ContextPyopencl'
-      platform:
-        required: true
-        type: string
-      suites:
-        description: a list of the suites to run as a JSON string
-        required: false
-        type: string
-        default: '["xobjects", "xdeps", "xpart", "xtrack", "xfields", "xcoll"]'
-
 env:
   with_gpu: ${{ contains(inputs.test_contexts, 'Cupy') || contains(inputs.test_contexts, 'Pyopencl') }}
 
