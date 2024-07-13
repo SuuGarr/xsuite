@@ -106,6 +106,7 @@ jobs:
   image-sanity-checks:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [download-image-manual-test , download-image-schedule ]
+    if: ${{ needs.download-image-manual-test.result == 'success' || needs.download-image-schedule.result == 'success' }}
     env: 
       image_id: ${{ needs.download-image-schedule.outputs.image_id || needs.download-image-manual-test.outputs.image_id }}
     steps:
@@ -123,7 +124,8 @@ jobs:
   # Run the tests for each repo in parallel in a test container
   run-tests:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
-    needs: [download-image-manual-test , download-image-schedule, image-sanity-checks]
+    needs: [image-sanity-checks]
+    if: ${{ needs.download-image-manual-test.result == 'success' || needs.download-image-schedule.result == 'success' }}
     timeout-minutes: 540
     strategy:
       fail-fast: false
@@ -146,7 +148,7 @@ jobs:
 
   wait:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
-    needs: [download-image-manual-test , download-image-schedule, run-tests]
+    needs: [run-tests]
     if: success() || failure()
     steps:
       - name: Wait
@@ -156,7 +158,7 @@ jobs:
   # no unused images and stopped containers
   teardown:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
-    needs: [download-image-manual-test , download-image-schedule, wait]
+    needs: [wait]
     env: 
       image_id: ${{ needs.download-image-schedule.outputs.image_id || needs.download-image-manual-test.outputs.image_id }}
     if: always()
