@@ -4,7 +4,7 @@ name: Daily test (self-hosted, CPU)
 # Controls when the action will run.
 on:
   schedule:
-    - cron: '25 14 * * *'  # run at 19:00 UTC daily
+    - cron: '25 09 * * *'  # run at 19:00 UTC daily
 
 # This workflow calls the test_gpu.yaml workflow passing the default
 # branches as inputs. The cron workflow will not run on forks.
@@ -19,28 +19,30 @@ jobs:
         "xtrack_location":"xsuite:main",
         "xfields_location":"xsuite:main",
         "xmask_location":"xsuite:main",
-        "xcoll_location":"xsuite:main"}'
+        "xcoll_location":"xsuite:main",
+        "xboinc_location":"xsuite:main"}'
+
   run-tests-cron-sh-cpu-no-xmask-serial:
     if: github.repository == 'SuuGarr/xsuite'
-    uses: ./.github/workflows/test_sh.yaml
+    uses: ./.github/workflows/dailytest_sh.yaml
     needs: run-build-image
     with:
       test_contexts: 'ContextCpu'
-      platform: 'Linux'
+      platform: 'test1'
       suites: '["xobjects", "xdeps", "xpart", "xtrack", "xfields", "xcoll","xboinc"]'
   run-tests-cron-sh-cpu-no-xmask-openmp:
     if: github.repository == 'SuuGarr/xsuite'
-    uses: ./.github/workflows/test_sh.yaml
+    uses: ./.github/workflows/dailytest_sh.yaml
     needs: run-build-image
     with:
       test_contexts: 'ContextCpu:auto'
-      platform: 'Linux'
+      platform: 'test3'
       suites: '["xobjects", "xdeps", "xpart", "xtrack", "xfields", "xcoll","xboinc"]'
   run-tests-cron-sh-cpu-xmask:
     if: github.repository == 'SuuGarr/xsuite'
-    uses: ./.github/workflows/test_sh.yaml
+    uses: ./.github/workflows/dailytest_sh.yaml
     needs: run-build-image
     with:
       test_contexts: 'ContextCpu;ContextCpu:auto'
-      platform: 'Linux'
+      platform: 'alma-tests'
       suites: '["xmask"]'
