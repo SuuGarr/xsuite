@@ -107,7 +107,7 @@ jobs:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [download-image-manual-test , download-image-schedule ]
     env: 
-      image_id: ${{ needs.download-image-schedule.outputs.image_id || needs.download-image-manual.outputs.image_id }}
+      image_id: ${{ needs.download-image-schedule.outputs.image_id || needs.download-image-manual-test.outputs.image_id }}
     steps:
       - name: CUDA/ROCm info
         if: ${{ env.with_gpu == 'true' }}
@@ -132,7 +132,7 @@ jobs:
     steps:
     - name: Run pytest
       env:
-        image_id: ${{ needs.download-image-schedule.outputs.image_id || needs.download-image-manual.outputs.image_id }}
+        image_id: ${{ needs.download-image-schedule.outputs.image_id || needs.download-image-manual-test.outputs.image_id }}
         test_contexts: ${{ inputs.test_contexts }}
         pytest_options: ${{ inputs.pytest_options }}
       run: |
@@ -158,7 +158,7 @@ jobs:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     needs: [download-image-manual-test , download-image-schedule, wait]
     env: 
-      image_id: ${{ needs.download-image-schedule.outputs.image_id || needs.download-image-manual.outputs.image_id }}
+      image_id: ${{ needs.download-image-schedule.outputs.image_id || needs.download-image-manual-test.outputs.image_id }}
     if: always()
     steps:
       - name: Stop the containers and remove the image
