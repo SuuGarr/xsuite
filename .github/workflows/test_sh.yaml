@@ -102,16 +102,16 @@ jobs:
           echo "Loaded Image: $IMAGE"
           echo "image_id=$IMAGE" >> $GITHUB_OUTPUT
   
-    consolidate-image:
-      runs-on: [self-hosted, "${{ inputs.platform }}"]
-      needs: [download-image-manual-test , download-image-schedule]
-      if: ${{ needs.download-image-manual-test.result == 'success' || needs.download-image-schedule.result == 'success' }}
-      outputs:
-        image_id: ${{ needs.download-image.outputs.image_id || needs.download-image-schedule.outputs.image_id }}
-      steps:
-        - name: Set image ID
-          run: |
-            echo "image_id=${{ needs.download-image.outputs.image_id || needs.download-image-schedule.outputs.image_id }}" >> $GITHUB_ENV
+  consolidate-image:
+    runs-on: [self-hosted, "${{ inputs.platform }}"]
+    needs: [download-image-manual-test , download-image-schedule]
+    if: ${{ needs.download-image-manual-test.result == 'success' || needs.download-image-schedule.result == 'success' }}
+    outputs:
+      image_id: ${{ needs.download-image.outputs.image_id || needs.download-image-schedule.outputs.image_id }}
+    steps:
+      - name: Set image ID
+        run: |
+          echo "image_id=${{ needs.download-image.outputs.image_id || needs.download-image-schedule.outputs.image_id }}" >> $GITHUB_ENV
 
       
   # Print out some stuff about the test environment
