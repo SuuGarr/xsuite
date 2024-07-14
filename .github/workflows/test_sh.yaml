@@ -51,7 +51,6 @@ jobs:
     uses: ./.github/workflows/build_image_sh.yaml
     with:
       locations: ${{ inputs.locations }}
-      platform: ${{ inputs.platform }}
 
   download-image:
     needs: trigger-build-image
