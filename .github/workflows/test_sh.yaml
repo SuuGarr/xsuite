@@ -36,7 +36,7 @@ on:
         type: string
         default: '["xobjects", "xdeps", "xpart", "xtrack", "xfields", "xcoll"]'
       schedule:
-        description: 'Time to run the job in HH:mm format (24-hour clock)'
+        description: Time to run the job in HH:mm format (UTC Time)
         required: false
         type: string
 
@@ -61,12 +61,12 @@ jobs:
             echo "No schedule set"
           else 
             while true; do
-              Current_Time=$(date +%H:%M)
+              Current_Time=$(date -u +%H:%M)
               if [[ "$Current_Time" == "${{ inputs.schedule }}" ]]; then
                 echo "Current time matches, Proceeding with the job."
                 break
               fi
-              echo "Current time is $Current_Time. Waiting for ${{ inputs.schedule }}"
+              echo "Current time is $Current_Time (UTC). Waiting for ${{ inputs.schedule }}"
               sleep 60
             done
           fi

@@ -39,7 +39,7 @@ on:
         type: string
         default: '["xobjects", "xdeps", "xpart", "xtrack", "xfields", "xmask", "xcoll"]'
       schedule:
-        description: 'Time to run the job in HH:mm format (24-hour clock)'
+        description: Time to run the job in HH:mm format (UTC Time)
         required: false
         type: string
 
