@@ -51,7 +51,7 @@ env:
 # The Job Trigger and Download image from GitHub Artifact 
 # branches as inputs
 jobs:
-  trigger-build-image:
+  wait-for-schedule:
     runs-on: [self-hosted, "${{ inputs.platform }}"]
     steps:
       - name: Wait for scheduled time(if any)
@@ -72,10 +72,11 @@ jobs:
           fi
         continue-on-error: true
 
-      - name: Trigger build image
-        uses: ./.github/workflows/build_image_sh.yaml
-        with:
-          locations: ${{ inputs.locations }}
+  trigger-build-image:
+    needs: wait-for-schedule
+    uses: ./.github/workflows/build_image_sh.yaml
+    with:
+      locations: ${{ inputs.locations }}
 
   download-image:
     needs: trigger-build-image
