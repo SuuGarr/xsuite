@@ -57,16 +57,16 @@ jobs:
       - name: Wait for scheduled time(if any)
         id: wait-for-schedule
         run: |
-          if [[ -z "${{ inputs.schedule }}"]]; then
+          if [[ -z "${{ inputs.schedule }}" ]]; then
             echo "No schedule set"
           else 
             while true; do
               Current_Time=$(date +%H:%M)
-              if [[ "$Current_Time" == "${{ inputs.schedule }}"]]; then
-                echo "Current time mayches, Proceeding with the job."
+              if [[ "$Current_Time" == "${{ inputs.schedule }}" ]]; then
+                echo "Current time matches, Proceeding with the job."
                 break
               fi
-              echo "Current time is $CURRENT_TIME.Waiting for ${{ inputs.schedule }}..."
+              echo "Current time is $Current_Time. Waiting for ${{ inputs.schedule }}"
               sleep 60
             done
           fi
