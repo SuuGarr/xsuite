@@ -52,7 +52,6 @@ env:
 # branches as inputs
 jobs:
   trigger-build-image:
-    runs-on: [self-hosted, "${{ inputs.platform }}"]
     steps:
       - name: Wait for scheduled time(if any)
         id: wait-for-schedule
