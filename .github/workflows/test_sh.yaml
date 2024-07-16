@@ -35,8 +35,16 @@ on:
         required: false
         type: string
         default: '["xobjects", "xdeps", "xpart", "xtrack", "xfields", "xcoll"]'
-    schedule:
-    - cron: "55 08 * * *"
+      hours:
+        description: Hour to run the job (00-23)
+        required: false
+        type: string
+        default: '19'
+      minute:
+        description: Minute to run the job (00-23)
+        required: false
+        type: string
+        default: '00'
 
 env:
   with_gpu: ${{ contains(inputs.test_contexts, 'Cupy') || contains(inputs.test_contexts, 'Pyopencl') }}
@@ -53,7 +61,25 @@ jobs:
     uses: ./.github/workflows/build_image_sh.yaml
     with:
       locations: ${{ inputs.locations }}
-
+    steps:
+      - name: Wait for scheduled time(if any)
+        id: wait-for-schedule
+        run: |
+          if [[ -z "${{ inputs.schedule }}"]]; then
+            echo "No schedule set"
+          else 
+            while true; do
+              Current_Time=$(date +%H:%M)
+              if [[ "$Current_Time" == "${{ inputs.schedule }}"]]; then
+                echo "Current time mayches, Proceeding with the job."
+                break
+              fi
+              echo "Current time is $CURRENT_TIME.Waiting for ${{ inputs.schedule }}..."
+              sleep 60
+            done
+          fi
+        continue-on-error: true
+        
   download-image:
     needs: trigger-build-image
     runs-on: [self-hosted, "${{ inputs.platform }}"]

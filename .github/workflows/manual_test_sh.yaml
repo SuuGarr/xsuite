@@ -38,6 +38,10 @@ on:
         required: true
         type: string
         default: '["xobjects", "xdeps", "xpart", "xtrack", "xfields", "xmask", "xcoll"]'
+      schedule:
+        description: 'Time to run the job in HH:mm format (24-hour clock)'
+        required: false
+        type: string
 
 # This workflow calls the test_sh.yaml workflow passing the specified
 # branches as inputs
@@ -51,3 +55,4 @@ jobs:
       test_contexts: ${{ inputs.test_contexts }}
       platform: ${{ inputs.platform }}
       suites: ${{ inputs.suites }}
+      schedule: ${{ inputs.schedule }}

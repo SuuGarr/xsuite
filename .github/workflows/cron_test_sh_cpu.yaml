@@ -21,7 +21,6 @@ jobs:
         "xmask_location":"xsuite:main",
         "xcoll_location":"xsuite:main",
         "xboinc_location":"xsuite:main"}'
-
   run-tests-cron-sh-cpu-no-xmask-serial:
     if: github.repository == 'SuuGarr/xsuite'
     uses: ./.github/workflows/dailytest_sh.yaml
