@@ -35,16 +35,10 @@ on:
         required: false
         type: string
         default: '["xobjects", "xdeps", "xpart", "xtrack", "xfields", "xcoll"]'
-      hours:
-        description: Hour to run the job (00-23)
+      schedule:
+        description: 'Time to run the job in HH:mm format (24-hour clock)'
         required: false
         type: string
-        default: '19'
-      minute:
-        description: Minute to run the job (00-23)
-        required: false
-        type: string
-        default: '00'
 
 env:
   with_gpu: ${{ contains(inputs.test_contexts, 'Cupy') || contains(inputs.test_contexts, 'Pyopencl') }}
@@ -58,9 +52,7 @@ env:
 # branches as inputs
 jobs:
   trigger-build-image:
-    uses: ./.github/workflows/build_image_sh.yaml
-    with:
-      locations: ${{ inputs.locations }}
+    runs-on: [self-hosted, "${{ inputs.platform }}"]
     steps:
       - name: Wait for scheduled time(if any)
         id: wait-for-schedule
@@ -79,7 +71,12 @@ jobs:
             done
           fi
         continue-on-error: true
-        
+
+      - name: Trigger build image
+        uses: ./.github/workflows/build_image_sh.yaml
+        with:
+          locations: ${{ inputs.locations }}
+
   download-image:
     needs: trigger-build-image
     runs-on: [self-hosted, "${{ inputs.platform }}"]
