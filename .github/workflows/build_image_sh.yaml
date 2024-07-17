@@ -76,7 +76,7 @@ jobs:
           ls -la
 
       - id: check-image-size
-        rum: |
+        run: |
           IMAGE_SIZE= $( du -h image.tar.gz | cut -f1)
           echo "Docker image size: $IMAGE_SIZE"
 
