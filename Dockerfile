@@ -21,30 +21,19 @@ ARG with_gpu
 # Use bash as the default shell
 SHELL ["/usr/bin/bash", "-c"]
 
-# If an Nvidia GPU is available, nvidia-container-toolkit takes care of
-# providing the right libraries and drivers to the container. There is no need
-# to install drivers inside the container. Only the ICD file is needed.
-RUN cat /sys/class/drm/card*/device/vendor | grep 0x10de; \
-    if [[ "$with_gpu" == true && $? == 0 ]]; then \
-        mkdir -p /etc/OpenCL/vendors \
-        && echo "libnvidia-opencl.so.1" > /etc/OpenCL/vendors/nvidia.icd; \
-    fi
+# Install NVIDIA OpenCL ICD
+RUN mkdir -p /etc/OpenCL/vendors \
+    && echo "libnvidia-opencl.so.1" > /etc/OpenCL/vendors/nvidia.icd
 
-# If an AMD GPU is available, the driver and ROCm libraries need to be installed
-# inside the container, including the right ICD profile. There is no counterpart
-# to nvidia-container-toolkit for AMD GPUs.
-RUN cat /sys/class/drm/card*/device/vendor | grep 0x1002; \
-    if [[ "$with_gpu" == true && $? == 0 ]]; then \
-        ROCM_VERSION=5.3 && AMDGPU_VERSION=5.3 \
-        && dnf install -y 'dnf-command(config-manager)' \
-        && dnf install -y epel-release \
-        && echo -e "[ROCm]\nname=ROCm\nbaseurl=https://repo.radeon.com/rocm/yum/$ROCM_VERSION/main\nenabled=1\ngpgcheck=0" >> /etc/yum.repos.d/rocm.repo \
-        && echo -e "[amdgpu]\nname=amdgpu\nbaseurl=https://repo.radeon.com/amdgpu/$AMDGPU_VERSION/rhel/8.7/main/x86_64\nenabled=1\ngpgcheck=0" >> /etc/yum.repos.d/amdgpu.repo \
-        && dnf install -y rocm-dev && dnf clean all && rm -rf /var/cache/yum \
-        && export PATH=/opt/rocm/hcc/bin:/opt/rocm/hip/bin:/opt/rocm/bin:${PATH:+:${PATH}} \
-        && export LD_LIBRARY_PATH=/opt/rocm/lib:/usr/local/lib; \
-    fi
-
+RUN ROCM_VERSION=5.3 && AMDGPU_VERSION=5.3 \
+    && dnf install -y 'dnf-command(config-manager)' \
+    && dnf install -y epel-release \
+    && echo -e "[ROCm]\nname=ROCm\nbaseurl=https://repo.radeon.com/rocm/yum/$ROCM_VERSION/main\nenabled=1\ngpgcheck=0" >> /etc/yum.repos.d/rocm.repo \
+    && echo -e "[amdgpu]\nname=amdgpu\nbaseurl=https://repo.radeon.com/amdgpu/$AMDGPU_VERSION/rhel/8.7/main/x86_64\nenabled=1\ngpgcheck=0" >> /etc/yum.repos.d/amdgpu.repo \
+    && dnf install -y rocm-dev && dnf clean all && rm -rf /var/cache/yum \
+    && export PATH=/opt/rocm/hcc/bin:/opt/rocm/hip/bin:/opt/rocm/bin:${PATH:+:${PATH}} \
+    && export LD_LIBRARY_PATH=/opt/rocm/lib:/usr/local/lib; 
+    
 WORKDIR /opt
 
 # Install mamba and set up an environment
