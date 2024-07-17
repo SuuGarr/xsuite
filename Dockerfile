@@ -22,9 +22,13 @@ ARG with_gpu
 SHELL ["/usr/bin/bash", "-c"]
 
 # Install NVIDIA OpenCL ICD
+# to install drivers inside the container. Only the ICD file is needed.
 RUN mkdir -p /etc/OpenCL/vendors \
     && echo "libnvidia-opencl.so.1" > /etc/OpenCL/vendors/nvidia.icd
 
+# Install AMD GPU drivers
+# inside the container, including the right ICD profile. There is no counterpart
+# to nvidia-container-toolkit for AMD GPUs.
 RUN ROCM_VERSION=5.3 && AMDGPU_VERSION=5.3 \
     && dnf install -y 'dnf-command(config-manager)' \
     && dnf install -y epel-release \
@@ -33,7 +37,7 @@ RUN ROCM_VERSION=5.3 && AMDGPU_VERSION=5.3 \
     && dnf install -y rocm-dev && dnf clean all && rm -rf /var/cache/yum \
     && export PATH=/opt/rocm/hcc/bin:/opt/rocm/hip/bin:/opt/rocm/bin:${PATH:+:${PATH}} \
     && export LD_LIBRARY_PATH=/opt/rocm/lib:/usr/local/lib; 
-    
+
 WORKDIR /opt
 
 # Install mamba and set up an environment
