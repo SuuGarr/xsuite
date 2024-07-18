@@ -18,7 +18,10 @@ on:
         "xcoll_location":"xsuite:main"}'
         required: false
         type: string
-        
+
+env:
+  with_gpu: ${{ contains(inputs.test_contexts, 'Cupy') || contains(inputs.test_contexts, 'Pyopencl') }}
+         
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 # The jobs are all run in independent environments. Here we will run a separate job
 # The jobs upload image to GitHub Artifact 
