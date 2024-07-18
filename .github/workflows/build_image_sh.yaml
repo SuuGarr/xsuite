@@ -18,7 +18,7 @@ on:
         "xcoll_location":"xsuite:main"}'
         required: false
         type: string
-
+        
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 # The jobs are all run in independent environments. Here we will run a separate job
 # The jobs upload image to GitHub Artifact 
@@ -56,6 +56,7 @@ jobs:
             --build-arg xfields_branch=$(jq -r '.["xfields_location"]' locations.json) \
             --build-arg xmask_branch=$(jq -r '.["xmask_location"]' locations.json) \
             --build-arg xcoll_branch=$(jq -r '.["xcoll_location"]' locations.json) \
+            --build-arg with_gpu=${with_gpu} \
             -t $IMAGE .
           docker save $IMAGE | gzip > $IMAGE.tar.gz
           ls -la
