@@ -36,9 +36,6 @@ on:
         type: string
         default: '["xobjects", "xdeps", "xpart", "xtrack", "xfields", "xcoll"]'
 
-env:
-  with_gpu: ${{ contains(inputs.test_contexts, 'Cupy') || contains(inputs.test_contexts, 'Pyopencl') }}
-
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 # The jobs are all run in independent environments. Here we will run a separate job
 # for each of the test suites specified in the matrix below.
