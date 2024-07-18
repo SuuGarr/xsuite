@@ -16,7 +16,7 @@ ARG xmask_branch=xsuite:main
 ARG xcoll_branch=xsuite:main
 ARG xsuite_branch=xsuite:main
 ARG xboinc_branch=xsuite:main 
-ARG with_gpu
+ARG with_gpu=true
 
 # Use bash as the default shell
 SHELL ["/usr/bin/bash", "-c"]
