@@ -18,15 +18,16 @@ on:
         "xcoll_location":"xsuite:main"}'
         required: false
         type: string
+
 env:
   with_gpu: ${{ contains(inputs.test_contexts, 'Cupy') || contains(inputs.test_contexts, 'Pyopencl') }}
-
+         
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 # The jobs are all run in independent environments. Here we will run a separate job
 # The jobs upload image to GitHub Artifact 
 jobs:
   build-and-upload:
-    runs-on: self-hosted
+    runs-on: [self-hosted, "${{ inputs.platform }}"]
     outputs:
       image_id: ${{ steps.build-image.outputs.image_id }}
     steps:
@@ -68,7 +69,7 @@ jobs:
         run: |
           echo "image_id: ${{ env.image_id }}"
           ls -la
-
+          
       - id: Upload-image
         name: Upload Docker image as artifact
         uses: actions/upload-artifact@v4
