@@ -17,6 +17,7 @@ ARG xcoll_branch=xsuite:main
 ARG xsuite_branch=xsuite:main
 ARG xboinc_branch=xsuite:main 
 ARG with_gpu=true
+RUN echo "with_gpu set to: $with_gpu"
 
 # Use bash as the default shell
 SHELL ["/usr/bin/bash", "-c"]
@@ -62,6 +63,7 @@ RUN pip install --no-cache-dir cython gitpython pytest-html \
     && rm -rf /var/cache/yum
 
 RUN if [[ "$with_gpu" == true ]]; then \
+        echo "Installing GPU-related packages..."; \
         mamba install cupy cudatoolkit ocl-icd-system clinfo clfft \
         && mamba clean -afy \
         && pip install --no-cache-dir pyopencl mako \
