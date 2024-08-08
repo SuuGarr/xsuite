@@ -10,30 +10,24 @@ XOBJECTS=xsuite:pytest-csv
    XMASK=xsuite:pytest-csv
    XCOLL=xsuite:pytest-csv
 
-pytest_options="$1"
+platform="$1"
+context="$2"
+pytest_options="$3"
 
 run_tests(){
-    local options=$1
+    local platform=$1
+    local context=$2
+    local options=$3
 
-    declare -A platform=(
-        ["alma"]="cuda"
-        ["ubuntu"]="cl"
-        ["pcbe-abp-gpu001"]="cpu"
-        ["radeon"]="cpu:auto"
-        ["alma-cpu-1"]="cpu"
-    )
+    echo "Running on $platform with $context and options: '$options'"
 
-    for platform in "${!platforms[@]}"; do
-        context="${platforms[$platform]}"
-        echo "Running on $platform with $context and options:'$options'"
-
-        python run_on_test_gh.py --suites xo,xp,xd,xt,xf,xc --platform $platform --ctx $context \ 
-            --xo $XOBJECTS --xp $XPART --xd $XDEPS --xt $XTRACK --xf $XFIELDS --xm $XMASK --xc $XCOLL \ 
-            --branch $WF_BRANCH --pytest-options"$options"
-    done 
+    python run_on_test_gh.py --suites xo,xp,xd,xt,xf,xc --platform "$platform" --ctx "$context" \
+        --xo "$XOBJECTS" --xp "$XPART" --xd "$XDEPS" --xt "$XTRACK" --xf "$XFIELDS" --xm "$XMASK" --xc "$XCOLL" \
+        --branch "$WF_BRANCH" --pytest-options "$options"
 
     python run_on_gh.py --suites xm --platform pcbe-abp-gpu001 --ctx cpu \
-        --xo $XOBJECTS --xp $XPART --xd $XDEPS --xt $XTRACK --xf $XFIELDS --xm $XMASK --xc $XCOLL --branch $WF_BRANCH --pytest-options"$options"
+        --xo "$XOBJECTS" --xp "$XPART" --xd "$XDEPS" --xt "$XTRACK" --xf "$XFIELDS" --xm "$XMASK" --xc "$XCOLL" \
+        --branch "$WF_BRANCH" --pytest-options "$options"
 }
 
-run_tests "$pytest_options"
+run_tests "$platform" "$context" "$pytest_options"
