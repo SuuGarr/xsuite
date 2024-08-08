@@ -1,14 +1,14 @@
 set -e # Exit immediately if a command exits with a non-zero status.
 
-WF_BRANCH="main"
+WF_BRANCH="pytest-csv"
 
-XOBJECTS=xsuite:main
-   XPART=xsuite:main
-   XDEPS=xsuite:main
+XOBJECTS=xsuite:pytest-csv
+   XPART=xsuite:pytest-csv
+   XDEPS=xsuite:pytest-csv
   XTRACK=xsuite:feature/twiss_ergonomics
- XFIELDS=xsuite:main
-   XMASK=xsuite:main
-   XCOLL=xsuite:main
+ XFIELDS=xsuite:pytest-csv
+   XMASK=xsuite:pytest-csv
+   XCOLL=xsuite:pytest-csv
 
 pytest_options="$1"
 
