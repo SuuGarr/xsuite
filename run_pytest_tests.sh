@@ -2,13 +2,13 @@ set -e # Exit immediately if a command exits with a non-zero status.
 
 WF_BRANCH="pytest-csv"
 
-XOBJECTS=SuuGarr:pytest-csv
-   XPART=SuuGarr:pytest-csv
-   XDEPS=SuuGarr:pytest-csv
-  XTRACK=SuuGarr:feature/twiss_ergonomics
- XFIELDS=SuuGarr:pytest-csv
-   XMASK=SuuGarr:pytest-csv
-   XCOLL=SuuGarr:pytest-csv
+XOBJECTS=xsuite:pytest-csv
+   XPART=xsuite:pytest-csv
+   XDEPS=xsuite:pytest-csv
+  XTRACK=xsuite:feature/twiss_ergonomics
+ XFIELDS=xsuite:pytest-csv
+   XMASK=xsuite:pytest-csv
+   XCOLL=xsuite:pytest-csv
 
 platform="$1"
 context="$2"
