@@ -1,4 +1,5 @@
-set -e # Exit immediately if a command exits with a non-zero status.
+#!/bin/bash
+set -e 
 
 WF_BRANCH="pytest-csv"
 
