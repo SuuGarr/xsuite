@@ -3,13 +3,13 @@ set -e
 
 WF_BRANCH="pytest-csv"
 
-XOBJECTS=xsuite:pytest-csv
-   XPART=xsuite:pytest-csv
-   XDEPS=xsuite:pytest-csv
-  XTRACK=xsuite:feature/twiss_ergonomics
- XFIELDS=xsuite:pytest-csv
-   XMASK=xsuite:pytest-csv
-   XCOLL=xsuite:pytest-csv
+XOBJECTS="xsuite:pytest-csv"
+   XPART=xsuite:"pytest-csv"
+   XDEPS=xsuite:"pytest-csv"
+  XTRACK=xsuite:"feature/twiss_ergonomics"
+ XFIELDS=xsuite:"pytest-csv"
+   XMASK=xsuite:"pytest-csv"
+   XCOLL=xsuite:"pytest-csv"
 
 platform="$1"
 context="$2"
