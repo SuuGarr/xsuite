@@ -11,10 +11,6 @@ XFIELDS="xsuite:main"
 XMASK="xsuite:main"
 XCOLL="xsuite:main"
 
-platform="$1"
-context="$2"
-pytest_options="$3"
-
 run_tests(){
     local platform=$1
     local context=$2
@@ -23,10 +19,14 @@ run_tests(){
     echo "Running on $platform with $context and options: '$options'"
 
     python run_on_test_gh.py --suites xo,xp,xd,xt,xf,xc --platform "$platform" --ctx "$context" \
-        --xo "$XOBJECTS" --xp "$XPART" --xd "$XDEPS" --xt "$XTRACK" --xf "$XFIELDS" --xm "$XMASK" --xc "$XCOLL" --branch "$WF_BRANCH" --pytest-options "$options"
+        --xo "$XOBJECTS" --xp "$XPART" --xd "$XDEPS" --xt "$XTRACK" --xf "$XFIELDS" --xm "$XMASK" --xc "$XCOLL" --branch "$WF_BRANCH" --pytest-opts "$options"
 
     python run_on_gh.py --suites xm --platform pcbe-abp-gpu001 --ctx cpu \
-        --xo "$XOBJECTS" --xp "$XPART" --xd "$XDEPS" --xt "$XTRACK" --xf "$XFIELDS" --xm "$XMASK" --xc "$XCOLL" --branch "$WF_BRANCH" --pytest-options "$options"
+        --xo "$XOBJECTS" --xp "$XPART" --xd "$XDEPS" --xt "$XTRACK" --xf "$XFIELDS" --xm "$XMASK" --xc "$XCOLL" --branch "$WF_BRANCH" --pytest-opts "$options"
 }
+
+platform="$1"
+context="$2"
+pytest_options="$3"
 
 run_tests "$platform" "$context" "$pytest_options"
