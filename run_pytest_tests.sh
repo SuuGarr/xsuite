@@ -27,6 +27,6 @@ run_tests(){
 
 platform="$1"
 context="$2"
-pytest_options="$3"
+pytest_opts="$3"
 
-run_tests "$platform" "$context" "$pytest_options"
+run_tests "$platform" "$context" "$pytest_opts"
