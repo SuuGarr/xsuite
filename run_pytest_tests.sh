@@ -3,13 +3,13 @@ set -e
 
 WF_BRANCH="pytest-csv"
 
-XOBJECTS="xsuite:pytest-csv"
-XPART="xsuite:pytest-csv"
-XDEPS="xsuite:pytest-csv"
+XOBJECTS="xsuite:main"
+XPART="xsuite:main"
+XDEPS="xsuite:main"
 XTRACK="xsuite:feature/twiss_ergonomics"
-XFIELDS="xsuite:pytest-csv"
-XMASK="xsuite:pytest-csv"
-XCOLL="xsuite:pytest-csv"
+XFIELDS="xsuite:main"
+XMASK="xsuite:main"
+XCOLL="xsuite:main"
 
 platform="$1"
 context="$2"
@@ -23,12 +23,10 @@ run_tests(){
     echo "Running on $platform with $context and options: '$options'"
 
     python run_on_test_gh.py --suites xo,xp,xd,xt,xf,xc --platform "$platform" --ctx "$context" \
-        --xo "$XOBJECTS" --xp "$XPART" --xd "$XDEPS" --xt "$XTRACK" --xf "$XFIELDS" --xm "$XMASK" --xc "$XCOLL" \
-        --branch "$WF_BRANCH" --pytest-options "$options"
+        --xo "$XOBJECTS" --xp "$XPART" --xd "$XDEPS" --xt "$XTRACK" --xf "$XFIELDS" --xm "$XMASK" --xc "$XCOLL" --branch "$WF_BRANCH" --pytest-options "$options"
 
     python run_on_gh.py --suites xm --platform pcbe-abp-gpu001 --ctx cpu \
-        --xo "$XOBJECTS" --xp "$XPART" --xd "$XDEPS" --xt "$XTRACK" --xf "$XFIELDS" --xm "$XMASK" --xc "$XCOLL" \
-        --branch "$WF_BRANCH" --pytest-options "$options"
+        --xo "$XOBJECTS" --xp "$XPART" --xd "$XDEPS" --xt "$XTRACK" --xf "$XFIELDS" --xm "$XMASK" --xc "$XCOLL" --branch "$WF_BRANCH" --pytest-options "$options"
 }
 
 run_tests "$platform" "$context" "$pytest_options"
