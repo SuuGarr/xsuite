@@ -19,10 +19,10 @@ run_tests(){
     echo "Running on $platform with $context and options: '$options'"
 
     python run_on_gh.py --suites xo,xp,xd,xt,xf,xc --platform "$platform" --ctx "$context" \
-        --xo "$XOBJECTS" --xp "$XPART" --xd "$XDEPS" --xt "$XTRACK" --xf "$XFIELDS" --xm "$XMASK" --xc "$XCOLL" --branch "$WF_BRANCH" --pytest-opts "$options"
+        --xo $XOBJECTS --xp $XPART --xd $XDEPS --xt $XTRACK --xf $XFIELDS --xm $XMASK --xc $XCOLL --branch $WF_BRANCH --pytest-opts $options
 
     python run_on_gh.py --suites xm --platform pcbe-abp-gpu001 --ctx cpu \
-        --xo "$XOBJECTS" --xp "$XPART" --xd "$XDEPS" --xt "$XTRACK" --xf "$XFIELDS" --xm "$XMASK" --xc "$XCOLL" --branch "$WF_BRANCH" --pytest-opts "$options"
+        --xo $XOBJECTS --xp $XPART --xd $XDEPS --xt $XTRACK --xf $XFIELDS --xm $XMASK --xc $XCOLL --branch $WF_BRANCH --pytest-opts $options
 }
 
 platform="$1"
